@@ -1,19 +1,35 @@
 package eatmoney;
 
+import java.util.ArrayList;
+
+import controlP5.ControlP5;
 import eatmoney.readData.State;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
+import processing.core.PGraphics;
+import processing.core.PShape;
 import processing.core.PVector;
 
 public class eatMoneyMain extends PApplet {
 	
 	//global Vars
 	String ppath = "";
-
+	PGraphics mc;
 	OscP5 oscP5;
 	NetAddress myRemoteLocation;
+	ControlP5 mainControl;
+	int mainDisplayWidth = 1920;
+	
+	//create controller surface
+	Controller cont;
+	//calibrate projector
+	Calibrate cal;
+
+	
+	public ArrayList<PShape> allPlanes;
+	public boolean calibrate = false;
 	
 	//mouse vars
 	boolean mousePress = false;
@@ -23,7 +39,7 @@ public class eatMoneyMain extends PApplet {
 	
 	boolean shiftSpace = false;
 	float shiftx,shiftz = 0;
-
+	int Planes = 2;
 
 	//Bulter Vars
 	int [] rawData;
@@ -59,38 +75,47 @@ public class eatMoneyMain extends PApplet {
 	float fov = 60; 
 	
 	//testvars
-	
 	int[] testvars = {10,14,15,19,20,24,26,30,32,35,36,42,46,49,53,56,59,62,64,66,70,71,78,81};
 	int nextvid = 0;
 	
 	public static void main(String[] args) {
 		PApplet.main("eatmoney.eatMoneyMain");
-
 	}
 
 	public void settings() {
 		//size(1400,768,P3D);
-		fullScreen(P3D,2);  
+		fullScreen(P3D,SPAN);  
 		ppath = sketchPath();
 	}
 	
 	public void setup() {
+		
+		mc = createGraphics(1920*Planes,height,P3D);
+		mc.stroke(0);
+		mc.perspective(radians(fov),(float)1920*Planes/(float)height,10,15000);
+		
+		cal = new Calibrate(this,Planes,mc);
+		cont = new Controller(this,this);
+		frameRate(30);
+		smooth();
 		
 		camTarget = new PVector(width/2.0f, height/2.0f,0);
 		camTargetnew = new PVector(width/2.0f, height/2.0f,0);
 		camPos = new PVector(width/2.0f, height/2.0f, (height/2.0f) / tan(PI*30.0f / 180.0f));
 		camPosnew = new PVector(width/2.0f, height/2.0f, (height/2.0f) / tan(PI*30.0f / 180.0f));
 		
-		frameRate(30);
+		
 		butler = new readData(this);
 		oscP5 = new OscP5(this,7000);
-		smooth();
-		stroke(0);
-		perspective(radians(fov),(float)width/(float)height,10,15000);
+
 	}
+	
 	
 	public void draw() {
 		 
+		clear();
+		background(0);
+		
 		if(mousePress == true){
 			  dx = (mouseclick.x - mouseX) * 0.01f;
 			  dy = (mouseclick.y - mouseY) * 0.01f;
@@ -114,119 +139,116 @@ public class eatMoneyMain extends PApplet {
 		  camPos.y = lerp (camPos.y,camPosnew.y,changespeed*0.1f); 
 		  camPos.z = lerp (camPos.z,camPosnew.z,changespeed*0.1f);
 		
-		
-		 clear();
-		 background(16);
+		 mc.beginDraw();
+		 mc.clear();
+		 mc.background(16);
 		 
-		 perspective(radians(fov),(float)width/(float)height,0.1f,4500);
-		 camera(camPos.x, camPos.y, camPos.z, camTarget.x, camTarget.y, camTarget.z, 0, 1, 0);		
+		 mc.perspective(radians(fov),(float)1920*Planes/(float)height,0.1f,4500);
+		 mc.camera(camPos.x, camPos.y, camPos.z, camTarget.x, camTarget.y, camTarget.z, 0, 1, 0);		
 		 //camera(map(mouseX,0,1920,800,800), 2, map(mouseY,0,1080,0,1400), camTarget.x, camTarget.y, camTarget.z, 0, 1, 0);
 		 //lights();
-		 directionalLight(200, 200, 200, 0, 1, 0);
-		 lightFalloff(1.2f, 0, 0);		 
-		 pointLight(180, 140, 40, camPos.x*1.2f, camPos.y*1.2f, camPos.z );
+		 mc.directionalLight(200, 200, 200, 0, 1, 0);
+		 mc.lightFalloff(1.2f, 0, 0);		 
+		 mc.pointLight(180, 140, 40, camPos.x*1.2f, camPos.y*1.2f, camPos.z );
 		 //translate(width/2, height/2, 0);
-		 noStroke();
+		 mc.noStroke();
 		 
 		
 		  
-		  //rotateX(rotx + dy);
-		  //rotateY(roty + dx);
-		  //translate(shiftx + sx,0,shiftz + sz);
+		 //rotateX(rotx + dy);
+		 //rotateY(roty + dx);
+		 //translate(shiftx + sx,0,shiftz + sz);
 		    
-		 
-		  if(butler.state == State.mix1 || butler.state == State.mix2 || butler.state == State.inmix){ 
-
-		  rawData = butler.readFrame();
-		 
-		  pushMatrix();
-		  //rotateX(rotX);
-		  //rotateY(rotY);
-
-		 butlerMin = new PVector(4500,4500,4500);
-		 butlerMax = new PVector(0,0,0);
-		  
-		 for(int y=0; y < kdh-steps;y+=steps)
-		  {
-			int y_kdw = y * kdw; 
-		    int y_steps_kdw = (y+steps)*kdw;
-		  
-		    
-		    for(int x=0;x < kdw-steps;x+=steps)
-		    {
-
-	    	  i00 = x + y_kdw;
-	    	  i01 = x + y_steps_kdw;
-	    	  i10 = (x + steps) + y_kdw;
-	          i11 = (x + steps) + y_steps_kdw;
-
-		      p00 = depthToWorld(x,y,rawData[i00]);
-		      p01 = depthToWorld(x,y+steps,rawData[i01]);
-		      p10 = depthToWorld(x+steps,y,rawData[i10]);
-		      p11 = depthToWorld(x+steps,y+steps,rawData[i11]);
-
-		      beginShape(TRIANGLES);  
-		      fill(255);
-		      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && // check for non valid values
-		          (abs(p00.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len) &&// check for edge length
-		          (p00.z < maxRange) && p00.z > minRange) {  // depth cut
-		    	  vertex(p00.x,p00.y,p00.z); 
-		    	  vertex(p01.x,p01.y,p01.z);
-		    	  vertex(p10.x,p10.y,p10.z);
-		    	  butlerMin.x = (p00.x < butlerMin.x) ? p00.x : butlerMin.x;
-		    	  butlerMin.y = (p00.y < butlerMin.y) ? p00.y : butlerMin.y;
-		    	  butlerMin.z = (p00.z < butlerMin.z) ? p00.z : butlerMin.z;
-		    	  butlerMin.x = (p01.x < butlerMin.x) ? p01.x : butlerMin.x;
-		    	  butlerMin.y = (p01.y < butlerMin.y) ? p01.y : butlerMin.y;
-		    	  butlerMin.z = (p01.z < butlerMin.z) ? p01.z : butlerMin.z;
-		    	  butlerMin.x = (p10.x < butlerMin.x) ? p10.x : butlerMin.x;
-		    	  butlerMin.y = (p10.y < butlerMin.y) ? p10.y : butlerMin.y;
-		    	  butlerMin.z = (p10.z < butlerMin.z) ? p10.z : butlerMin.z;
-		    	  
-		    	  butlerMax.x = (p00.x > butlerMax.x) ? p00.x : butlerMax.x;
-		    	  butlerMax.y = (p00.y > butlerMax.y) ? p00.y : butlerMax.y;
-		    	  butlerMax.z = (p00.z > butlerMax.z) ? p00.z : butlerMax.z;
-		    	  butlerMax.x = (p01.x > butlerMax.x) ? p01.x : butlerMax.x;
-		    	  butlerMax.y = (p01.y > butlerMax.y) ? p01.y : butlerMax.y;
-		    	  butlerMax.z = (p01.z > butlerMax.z) ? p01.z : butlerMax.z;
-		    	  butlerMax.x = (p10.x > butlerMax.x) ? p10.x : butlerMax.x;
-		    	  butlerMax.y = (p10.y > butlerMax.y) ? p10.y : butlerMax.y;
-		    	  butlerMax.z = (p10.z > butlerMax.z) ? p10.z : butlerMax.z;
-		    	  
-		          }
-		      if ((p11.z > 0) && (p01.z > 0) && (p10.z > 0) &&
-		          (abs(p11.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len) &&
-		          (p11.z < maxRange) && p00.z > minRange){
-		    	  vertex(p01.x,p01.y,p01.z);
-		    	  vertex(p11.x,p11.y,p11.z);
-		    	  vertex(p10.x,p10.y,p10.z);
-		    	  butlerMin.x = (p11.x < butlerMin.x) ? p11.x : butlerMin.x;
-		    	  butlerMin.y = (p11.y < butlerMin.y) ? p11.y : butlerMin.y;
-		    	  butlerMin.z = (p11.z < butlerMin.z) ? p11.z : butlerMin.z;
-		    	  butlerMin.x = (p01.x < butlerMin.x) ? p01.x : butlerMin.x;
-		    	  butlerMin.y = (p01.y < butlerMin.y) ? p01.y : butlerMin.y;
-		    	  butlerMin.z = (p01.z < butlerMin.z) ? p01.z : butlerMin.z;
-		    	  butlerMin.x = (p10.x < butlerMin.x) ? p10.x : butlerMin.x;
-		    	  butlerMin.y = (p10.y < butlerMin.y) ? p10.y : butlerMin.y;
-		    	  butlerMin.z = (p10.z < butlerMin.z) ? p10.z : butlerMin.z;
-		    	  
-		    	  butlerMax.x = (p11.x > butlerMax.x) ? p11.x : butlerMax.x;
-		    	  butlerMax.y = (p11.y > butlerMax.y) ? p11.y : butlerMax.y;
-		    	  butlerMax.z = (p11.z > butlerMax.z) ? p11.z : butlerMax.z;
-		    	  butlerMax.x = (p01.x > butlerMax.x) ? p01.x : butlerMax.x;
-		    	  butlerMax.y = (p01.y > butlerMax.y) ? p01.y : butlerMax.y;
-		    	  butlerMax.z = (p01.z > butlerMax.z) ? p01.z : butlerMax.z;
-		    	  butlerMax.x = (p10.x > butlerMax.x) ? p10.x : butlerMax.x;
-		    	  butlerMax.y = (p10.y > butlerMax.y) ? p10.y : butlerMax.y;
-		    	  butlerMax.z = (p10.z > butlerMax.z) ? p10.z : butlerMax.z;
-		          }
-		      endShape();
-
-		   }
-		  }
-		 
-
-		 popMatrix();
+		 if(butler.state == State.mix1 || butler.state == State.mix2 || butler.state == State.inmix){ 
+			 rawData = butler.readFrame();	 
+			 mc.pushMatrix();
+			 //mc.rotateX(rotX);
+			 //mc.rotateY(rotY);
+	
+			 butlerMin = new PVector(4500,4500,4500);
+			 butlerMax = new PVector(0,0,0);
+			  
+			 for(int y=0; y < kdh-steps;y+=steps)
+			  {
+				int y_kdw = y * kdw; 
+			    int y_steps_kdw = (y+steps)*kdw;
+			  
+			    
+			    for(int x=0;x < kdw-steps;x+=steps)
+			    {
+	
+		    	  i00 = x + y_kdw;
+		    	  i01 = x + y_steps_kdw;
+		    	  i10 = (x + steps) + y_kdw;
+		          i11 = (x + steps) + y_steps_kdw;
+	
+			      p00 = depthToWorld(x,y,rawData[i00]);
+			      p01 = depthToWorld(x,y+steps,rawData[i01]);
+			      p10 = depthToWorld(x+steps,y,rawData[i10]);
+			      p11 = depthToWorld(x+steps,y+steps,rawData[i11]);
+	
+			      mc.beginShape(TRIANGLES);  
+			      mc.fill(255);
+			      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && // check for non valid values
+			          (abs(p00.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len) &&// check for edge length
+			          (p00.z < maxRange) && p00.z > minRange) {  // depth cut
+			    	  mc.vertex(p00.x,p00.y,p00.z); 
+			    	  mc.vertex(p01.x,p01.y,p01.z);
+			    	  mc.vertex(p10.x,p10.y,p10.z);
+			    	  butlerMin.x = (p00.x < butlerMin.x) ? p00.x : butlerMin.x;
+			    	  butlerMin.y = (p00.y < butlerMin.y) ? p00.y : butlerMin.y;
+			    	  butlerMin.z = (p00.z < butlerMin.z) ? p00.z : butlerMin.z;
+			    	  butlerMin.x = (p01.x < butlerMin.x) ? p01.x : butlerMin.x;
+			    	  butlerMin.y = (p01.y < butlerMin.y) ? p01.y : butlerMin.y;
+			    	  butlerMin.z = (p01.z < butlerMin.z) ? p01.z : butlerMin.z;
+			    	  butlerMin.x = (p10.x < butlerMin.x) ? p10.x : butlerMin.x;
+			    	  butlerMin.y = (p10.y < butlerMin.y) ? p10.y : butlerMin.y;
+			    	  butlerMin.z = (p10.z < butlerMin.z) ? p10.z : butlerMin.z;
+			    	  
+			    	  butlerMax.x = (p00.x > butlerMax.x) ? p00.x : butlerMax.x;
+			    	  butlerMax.y = (p00.y > butlerMax.y) ? p00.y : butlerMax.y;
+			    	  butlerMax.z = (p00.z > butlerMax.z) ? p00.z : butlerMax.z;
+			    	  butlerMax.x = (p01.x > butlerMax.x) ? p01.x : butlerMax.x;
+			    	  butlerMax.y = (p01.y > butlerMax.y) ? p01.y : butlerMax.y;
+			    	  butlerMax.z = (p01.z > butlerMax.z) ? p01.z : butlerMax.z;
+			    	  butlerMax.x = (p10.x > butlerMax.x) ? p10.x : butlerMax.x;
+			    	  butlerMax.y = (p10.y > butlerMax.y) ? p10.y : butlerMax.y;
+			    	  butlerMax.z = (p10.z > butlerMax.z) ? p10.z : butlerMax.z;
+			    	  
+			          }
+			      if ((p11.z > 0) && (p01.z > 0) && (p10.z > 0) &&
+			          (abs(p11.z-p01.z) < max_edge_len) && (abs(p10.z-p01.z) < max_edge_len) &&
+			          (p11.z < maxRange) && p00.z > minRange){
+			    	  mc.vertex(p01.x,p01.y,p01.z);
+			    	  mc.vertex(p11.x,p11.y,p11.z);
+			    	  mc.vertex(p10.x,p10.y,p10.z);
+			    	  butlerMin.x = (p11.x < butlerMin.x) ? p11.x : butlerMin.x;
+			    	  butlerMin.y = (p11.y < butlerMin.y) ? p11.y : butlerMin.y;
+			    	  butlerMin.z = (p11.z < butlerMin.z) ? p11.z : butlerMin.z;
+			    	  butlerMin.x = (p01.x < butlerMin.x) ? p01.x : butlerMin.x;
+			    	  butlerMin.y = (p01.y < butlerMin.y) ? p01.y : butlerMin.y;
+			    	  butlerMin.z = (p01.z < butlerMin.z) ? p01.z : butlerMin.z;
+			    	  butlerMin.x = (p10.x < butlerMin.x) ? p10.x : butlerMin.x;
+			    	  butlerMin.y = (p10.y < butlerMin.y) ? p10.y : butlerMin.y;
+			    	  butlerMin.z = (p10.z < butlerMin.z) ? p10.z : butlerMin.z;
+			    	  
+			    	  butlerMax.x = (p11.x > butlerMax.x) ? p11.x : butlerMax.x;
+			    	  butlerMax.y = (p11.y > butlerMax.y) ? p11.y : butlerMax.y;
+			    	  butlerMax.z = (p11.z > butlerMax.z) ? p11.z : butlerMax.z;
+			    	  butlerMax.x = (p01.x > butlerMax.x) ? p01.x : butlerMax.x;
+			    	  butlerMax.y = (p01.y > butlerMax.y) ? p01.y : butlerMax.y;
+			    	  butlerMax.z = (p01.z > butlerMax.z) ? p01.z : butlerMax.z;
+			    	  butlerMax.x = (p10.x > butlerMax.x) ? p10.x : butlerMax.x;
+			    	  butlerMax.y = (p10.y > butlerMax.y) ? p10.y : butlerMax.y;
+			    	  butlerMax.z = (p10.z > butlerMax.z) ? p10.z : butlerMax.z;
+			          }
+			      mc.endShape();
+	
+			   }
+			  }
+			 
+	
+			 mc.popMatrix();
 		 }
 
 		  butlerMean.x = lerp(butlerMin.x,butlerMax.x, 0.5f);
@@ -241,10 +263,29 @@ public class eatMoneyMain extends PApplet {
 		  popMatrix();
 		  */
 		  
-		  stroke(255);
-		  fill(255);
-
-		  surface.setTitle("fps: " + frameRate);
+		  mc.stroke(255);
+		  mc.fill(255);
+		  mc.endDraw();
+		  
+		  //----------------------------------------------------------------------------------
+		  
+		  //show Main content
+		  if(cal.planeObjects != null && cal.planeObjects.size() > 0) {
+			  for(PShape p : cal.planeObjects) {
+				  shape(p);
+			  }
+		  }
+		  //show Control Content
+		  image(mc,0,0,960*Planes,540);
+		  
+		  //show Calibration Interface
+		  if(calibrate == true) {
+			  cal.drawPlanes();
+			  image(cal.cali,210,0);
+		  }
+		  
+		  text("FPS: " + frameRate,10,height-20);
+		  
 
 	}
 	
@@ -264,8 +305,6 @@ public class eatMoneyMain extends PApplet {
 	}
 	
 	void oscEvent(OscMessage theOscMessage) {
-		
-		
 		  if(theOscMessage.addrPattern().equals("/butler")) {
 			  int take = theOscMessage.get(0).intValue(); 
 			  butler.openTake(take);
@@ -292,18 +331,29 @@ public class eatMoneyMain extends PApplet {
 	}
 	
 	public void mousePressed(){
-		  if (mouseButton == LEFT){
-			  mousePress = true;
-			  mouseclick.x = mouseX;
-			  mouseclick.y = mouseY;
-		  }
-		  else if (mouseButton == RIGHT){
-			  shiftSpace = true;
-			  mouseclick.x = mouseX;
-			  mouseclick.y = mouseY;
-		  }
-		}	
+		if(calibrate == false) {
+			  if (mouseButton == LEFT){
+				  mousePress = true;
+				  mouseclick.x = mouseX;
+				  mouseclick.y = mouseY;
+			  }
+			  else if (mouseButton == RIGHT){
+				  shiftSpace = true;
+				  mouseclick.x = mouseX;
+				  mouseclick.y = mouseY;
+			  }
+		}
+		
+		else if(calibrate == true && (mouseX>210 && mouseX<cal.cali.width+210) && (mouseY > 0 && mouseY < cal.cali.height)) {
+		   cal.mouseP = true;
+		   int col = get(mouseX, mouseY);
+		   cal.currenthandle = red(col);
+		}
+		
+	}
+	
 	public void mouseReleased(){
+		if(calibrate == false) {
 		   if (mouseButton == LEFT){
 			mousePress = false;
 			rotx += dy;
@@ -319,4 +369,10 @@ public class eatMoneyMain extends PApplet {
 		    sz = 0;
 		  }
 		}
+		else if(calibrate == true) {
+			cal.mouseP = false;
+		}
+	}
+	
+
 }
