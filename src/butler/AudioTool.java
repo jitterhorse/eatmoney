@@ -1,5 +1,6 @@
-package eatmoney;
+package butler;
 import ddf.minim.*;
+import eatmoney.eatMoneyMain;
 
 public class AudioTool {
 
@@ -20,10 +21,10 @@ public class AudioTool {
 
 	}
 	
-	public void playSound(String path) {
+	public void playSound(String path,int delay) {
 		isPlaying = true;
 		player =  minim.loadFile(path + "\\sound.wav");
-		player.play();
+		player.play(delay);
 	}
 	
 	public int getPosition() {

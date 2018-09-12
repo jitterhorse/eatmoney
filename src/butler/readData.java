@@ -1,4 +1,4 @@
-package eatmoney;
+package butler;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.stream.Stream;
 
 import javax.swing.plaf.synth.SynthSpinnerUI;
+
+import eatmoney.eatMoneyMain;
 
 public class readData{
   
@@ -28,7 +30,7 @@ public class readData{
   private int lastNew = 0;
   
   boolean shownoise = false;
-  float transtitionSpeed = 0.1f;
+  float transtitionSpeed = 0.15f;
   
   AudioTool [] audio;
   
@@ -37,20 +39,34 @@ public class readData{
   float visible = 0.f; //mix in and out
   float transition = 0.f; // 0.0=idle <-> 1.0=action
   
-  float [] deformMatrix = new float[8];
+  public float [] deformMatrix = new float[8];
+  
+  Butler butler;
   
   //init class
-  public readData( eatMoneyMain _em){
+  public readData( eatMoneyMain _em, Butler _butler) {
 	this.em = _em;
+	this.butler = _butler;
 	audio = new AudioTool[2];
 	audio[0] = new AudioTool(em);
 	audio[1] = new AudioTool(em);
-	openTake(idlestate);
+	//openTake(idlestate);
+  }
+  
+  public void initButler() {
+	  openTake(idlestate);
+  }
+  
+  public void stopButler() {
+	  audio[0].stopSound();
+	  audio[1].stopSound();
   }
  
   
   public void openTake(int p) {
 	
+	int delay = butler.butlerDelays.get(p).intValue();
+	  
 	int target = 0;  
 	if(this.state == State.mix1) target = 1;
 	else if(this.state == State.inmix) {
@@ -67,15 +83,14 @@ public class readData{
 	    Stream<Path> files = Files.list(Paths.get(this.path[target]));
 	    maxCount[target] = (int)files.count()-1; //one is soundfile 
 	    files.close();
-	    this.audio[target].playSound(this.path[target]);
+	    this.audio[target].playSound(this.path[target],delay);
 
 	    isPlaying[target] =  1;
 	    if(isPlaying[0] == 1 && isPlaying[1] == 1) this.state = State.inmix;  
 	    else if(isPlaying[0] == 1) this.state = State.mix1;
 	    else if(isPlaying[1] == 1) this.state = State.mix2;
 	    else if(isPlaying[0] == 0 && isPlaying[1] == 0) this.state = State.none; 
- 
-	    //System.out.println(isPlaying[0]+ " / " + isPlaying[1] + " / " + this.state);
+
      }
      catch (IOException e) {
     	e.printStackTrace();

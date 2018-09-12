@@ -1,7 +1,8 @@
-package eatmoney;
+package calibrate;
 
 import java.util.ArrayList;
 
+import eatmoney.eatMoneyMain;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PShape;
@@ -14,13 +15,15 @@ public class Calibrate {
 	  eatMoneyMain em;
 	
 	  int count;
-	  int totalcount;
+	  public int totalcount;
 	  ArrayList<handle> allHandles;
 	  float [][][] renderSource;// = new float[2][20][2];
 	  float [][][] renderResult;
 	  float offset = 0;
 	  
-	  PGraphics cali;
+	  public PGraphics cali;
+
+	public PGraphics preview;
 	  int cheight;
 	  int cwidth;	 
 	  
@@ -29,9 +32,9 @@ public class Calibrate {
 	  int targetheight = 1080;
 
 	  private ArrayList<Plane> allPlanes;
-	  ArrayList<PShape> planeObjects;
+	  public ArrayList<PShape> planeObjects;
 	  
-	  boolean mouseP = false;
+	  public boolean mouseP = false;
 	  int edit = 0;
 	  int editpoint=0;
 	  int stepsx = 16;
@@ -39,19 +42,31 @@ public class Calibrate {
 	
 	  int border = 50;
 
-	  float currenthandle = 0.f;
-
+	  public float currenthandle = 0.f;
+	  String filename;
+	  boolean newCalibration;
 	  
-	  
-	public Calibrate(eatMoneyMain _em,int _totalcount,PGraphics _content) {
+	public Calibrate(eatMoneyMain _em,int _totalcount,String _filename, boolean _newCalibration, PGraphics _content) {
 		em = _em;
 		totalcount = _totalcount;
 		this.content = _content;
+		newCalibration = _newCalibration;
 		targetwidth = 1920*totalcount;
 		cwidth = 1280;
 		cheight = 720/totalcount;
 		
+		filename = _filename;
+		
+		
+		
+		if(newCalibration == false) {
+			JSONArray savedDataCheck = em.loadJSONArray("json//"+filename);
+			totalcount = savedDataCheck.size();
+			cheight = 720/totalcount;
+		}
+		
 		cali = em.createGraphics(cwidth+ border*2,cheight+ border*2,PConstants.P3D);
+		preview = em.createGraphics(cwidth,cheight,PConstants.P3D); 
 		this.allPlanes = new ArrayList<Plane>(); 
 		
 		 //create ContentPlanes
@@ -60,9 +75,16 @@ public class Calibrate {
 		  this.allPlanes.add(pl);
 		 }
 		
-		this.readData();
+		if(newCalibration == false) {
+			this.readData();
+		}
+		
 		this.drawPlanes();
 		this.renderPlanes();
+		
+		if(newCalibration == true) {
+			this.saveData();
+		}	
 		
 	}
 	
@@ -73,16 +95,28 @@ public class Calibrate {
 		cali.strokeWeight(1);
 		cali.background(70);
 		cali.translate(border,border);
+		//render background
 		for(int i = 0; i < allPlanes.size(); i++){
 			cali.fill(255,100);
 			cali.stroke(70);
 			cali.rect((cwidth/totalcount)*i,0,(cwidth/totalcount),(720/totalcount));
 		}
 	    for(int i = 0; i < allPlanes.size(); i++){
-	      allPlanes.get(i).draw();
+	      allPlanes.get(i).draw(this.cali);
 	    }
 		cali.endDraw();
+		
+		preview.beginDraw();
+		preview.hint(PConstants.DISABLE_OPTIMIZED_STROKE);
+		preview.clear();		
+		for(int i = 0; i < allPlanes.size(); i++){
+		      allPlanes.get(i).draw(this.preview);
+		    }
+		
+		preview.endDraw();
 	}
+	
+	
 	
 	public void renderPlanes() {
 		planeObjects = new ArrayList<PShape>();
@@ -105,13 +139,17 @@ public class Calibrate {
 			}
 			saveddata.setJSONArray(allPlanes.indexOf(p), planedata);
 		}
-		em.saveJSONArray(saveddata,"json/handles.json");
+		
+		//System.out.println(filename);
+		em.saveJSONArray(saveddata,"json//"+filename);
 	}
 
 	public void readData() {
-		JSONArray savedData = em.loadJSONArray("json/handles.json");
+		JSONArray savedData = em.loadJSONArray("json//"+filename);
+		//System.out.println(savedData.size());
 		for (int i = 0; i < savedData.size(); i++) {
 			JSONArray plane = savedData.getJSONArray(i);
+			//System.out.println(plane.size());
 				for (int j = 0; j < plane.size(); j++) {
 					JSONObject handle = plane.getJSONObject(j);
 					allPlanes.get(i).allHandles.get(j).pos.x = handle.getFloat("posx");

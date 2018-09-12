@@ -1,8 +1,9 @@
-package eatmoney;
+package calibrate;
 
 import java.util.ArrayList;
 
 import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
 
@@ -39,7 +40,7 @@ class Plane{
 	  
   
 	  
-	  public void draw(){   
+	  public void draw(PGraphics target){   
 	      int handleshift = this.count * 8;
 	      
 	      if(c.mouseP == true && (c.currenthandle > (255 - 8 - handleshift) && c.currenthandle <= (255-handleshift))){
@@ -47,43 +48,43 @@ class Plane{
 	         this.allHandles.get((int)(255-c.currenthandle - handleshift)).pos.y = c.em.mouseY-c.border;
 	        }
 	    
-	      c.cali.pushMatrix();
-	      c.cali.noFill();
-	      c.cali.strokeWeight(2);
-	      c.cali.stroke(0);
-	      c.cali.bezier( this.allHandles.get(0).pos.x,allHandles.get(0).pos.y,
+	      target.pushMatrix();
+	      target.noFill();
+	      target.strokeWeight(2);
+	      target.stroke(0);
+	      target.bezier( this.allHandles.get(0).pos.x,allHandles.get(0).pos.y,
 	              allHandles.get(1).pos.x,allHandles.get(1).pos.y,
 	              allHandles.get(2).pos.x,allHandles.get(2).pos.y,
 	              allHandles.get(3).pos.x,allHandles.get(3).pos.y);
-	      c.cali.stroke(122,20,29,100);
-	      c.cali.line(allHandles.get(0).pos.x,allHandles.get(0).pos.y,allHandles.get(1).pos.x,allHandles.get(1).pos.y); 
-	      c.cali.line(allHandles.get(2).pos.x,allHandles.get(2).pos.y,allHandles.get(3).pos.x,allHandles.get(3).pos.y);  
+	      target.stroke(122,20,29,100);
+	      target.line(allHandles.get(0).pos.x,allHandles.get(0).pos.y,allHandles.get(1).pos.x,allHandles.get(1).pos.y); 
+	      target.line(allHandles.get(2).pos.x,allHandles.get(2).pos.y,allHandles.get(3).pos.x,allHandles.get(3).pos.y);  
 	      
 	      
-	      c.cali.stroke(0);
-	      c.cali.bezier( allHandles.get(4).pos.x,allHandles.get(4).pos.y,
+	      target.stroke(0);
+	      target.bezier( allHandles.get(4).pos.x,allHandles.get(4).pos.y,
 	              allHandles.get(5).pos.x,allHandles.get(5).pos.y,
 	              allHandles.get(6).pos.x,allHandles.get(6).pos.y,
 	              allHandles.get(7).pos.x,allHandles.get(7).pos.y);
-	      c.cali.stroke(122,20,29,100);
-	      c.cali.line(allHandles.get(4).pos.x,allHandles.get(4).pos.y,allHandles.get(5).pos.x,allHandles.get(5).pos.y); 
-	      c.cali.line(allHandles.get(6).pos.x,allHandles.get(6).pos.y,allHandles.get(7).pos.x,allHandles.get(7).pos.y); 
+	      target.stroke(122,20,29,100);
+	      target.line(allHandles.get(4).pos.x,allHandles.get(4).pos.y,allHandles.get(5).pos.x,allHandles.get(5).pos.y); 
+	      target.line(allHandles.get(6).pos.x,allHandles.get(6).pos.y,allHandles.get(7).pos.x,allHandles.get(7).pos.y); 
 	    
-	      c.cali.stroke(0);
-	      c.cali.line(allHandles.get(0).pos.x,allHandles.get(0).pos.y,allHandles.get(4).pos.x,allHandles.get(4).pos.y);
-	      c.cali.line(allHandles.get(3).pos.x,allHandles.get(3).pos.y,allHandles.get(7).pos.x,allHandles.get(7).pos.y);
-	      c.cali.popMatrix();
+	      target.stroke(0);
+	      target.line(allHandles.get(0).pos.x,allHandles.get(0).pos.y,allHandles.get(4).pos.x,allHandles.get(4).pos.y);
+	      target.line(allHandles.get(3).pos.x,allHandles.get(3).pos.y,allHandles.get(7).pos.x,allHandles.get(7).pos.y);
+	      target.popMatrix();
 	      
 	      
 	      // top line
 	      for (int i = 0; i <= c.stepsx; i++) {
 	        float t = i / (float)c.stepsx;
-	        float x = c.cali.bezierPoint(allHandles.get(0).pos.x,
+	        float x = target.bezierPoint(allHandles.get(0).pos.x,
 	                              allHandles.get(1).pos.x,
 	                              allHandles.get(2).pos.x,
 	                              allHandles.get(3).pos.x,
 	                              t);
-	        float y = c.cali.bezierPoint(allHandles.get(0).pos.y,
+	        float y = target.bezierPoint(allHandles.get(0).pos.y,
 	                              allHandles.get(1).pos.y,
 	                              allHandles.get(2).pos.y,
 	                              allHandles.get(3).pos.y,
@@ -99,12 +100,12 @@ class Plane{
 	    //bottom Line
 	      for (int i = 0; i <= c.stepsx; i++) {
 	        float t = i / (float)c.stepsx;
-	        float x = c.cali.bezierPoint(allHandles.get(4).pos.x,
+	        float x = target.bezierPoint(allHandles.get(4).pos.x,
 	                              allHandles.get(5).pos.x,
 	                              allHandles.get(6).pos.x,
 	                              allHandles.get(7).pos.x,
 	                              t);
-	        float y = c.cali.bezierPoint(allHandles.get(4).pos.y,
+	        float y = target.bezierPoint(allHandles.get(4).pos.y,
 	                              allHandles.get(5).pos.y,
 	                              allHandles.get(6).pos.y,
 	                              allHandles.get(7).pos.y,
@@ -123,17 +124,17 @@ class Plane{
 	          
 	        float x = c.em.lerp(renderSource[0][j][0],renderSource[1][j][0],i/(float)c.stepsy);
 	        float y = c.em.lerp(renderSource[0][j][1],renderSource[1][j][1],i/(float)c.stepsy);
-	        c.cali.fill(0,255,0);
-	        c.cali.noStroke();
-	        c.cali.ellipse(x,y,5,5);
+	        target.fill(0,255,0);
+	        target.noStroke();
+	        target.ellipse(x,y,5,5);
 	        renderResult[i][j][0] = x;
 	        renderResult[i][j][1] = y;
 	        }
 	      }
 	      
 	      for(handle h : allHandles){
-		       c.cali.fill(h.col,255);
-		       c.cali.ellipse(h.pos.x,h.pos.y,20,20);
+		       target.fill(h.col,255);
+		       target.ellipse(h.pos.x,h.pos.y,20,20);
 		      }
 		      
 	  }
@@ -141,13 +142,15 @@ class Plane{
 	  public PShape renderPlane(){
 	      float deltau = (1.f/(float)totalcount);
 	      float startu = deltau*count;
+	      
 	      PShape object;
 	      object = c.cali.createShape();
 	      object.beginShape(PConstants.QUADS);
 	      object.textureMode(PConstants.NORMAL);
 	      object.texture(c.content);
-	      object.noStroke();
+	      object.noStroke(); 
 	      int xoffset = c.em.mainDisplayWidth;
+	      
 	      for(int i = 0; i < c.stepsy;i++){
 	        for(int j = 0; j < c.stepsx;j++){  
 	        float x = xoffset+renderResult[i][j][0]*totalcount*1.5f;
@@ -164,6 +167,7 @@ class Plane{
 	        object.vertex(x,y,0,startu+((float)j/(float)c.stepsx)*deltau,((float)i+1)/(float)c.stepsy);  
 	        }
 	      }
+	      
 	      object.endShape();
 	      return object;
 	  }
