@@ -12,7 +12,7 @@ public class VideoCaptureTool {
 	public VideoCaptureTool(eatMoneyMain _emm) {
 		
 		emm = _emm;
-		cam = new Capture(emm, 640, 480,30);
+		cam = new Capture(emm, 1280, 720,50);
 		cam.start();
 	}
 	

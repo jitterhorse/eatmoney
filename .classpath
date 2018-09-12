@@ -2,12 +2,13 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/javacpp"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/controlp5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/processingVideo"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/osc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/controlP5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/minim"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/processing"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/video"/>
-	<classpathentry kind="lib" path="C:/Users/jitterhorse/workspace/LIBS/bytedeco/javacpp-presets/opencv-platform/3.4.2-1.4.2/opencv-platform-3.4.2-1.4.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

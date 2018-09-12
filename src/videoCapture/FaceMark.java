@@ -69,16 +69,16 @@ public class FaceMark implements Runnable{
 
 	    	emm = _emm;
 	    	
-	        faceDetector = CudaCascadeClassifier.create("C:\\opencv_3.0\\opencv\\sources\\data\\haarcascades_cuda\\haarcascade_frontalface_alt2.xml");
-	        faceDetector2 = CudaCascadeClassifier.create("C:\\opencv_3.0\\opencv\\sources\\data\\haarcascades_cuda\\haarcascade_eye.xml");
-	        faceDetector3 = CudaCascadeClassifier.create("C:\\opencv_3.0\\opencv\\sources\\data\\haarcascades_cuda\\haarcascade_upperbody.xml");
-	        faceDetector4 =CudaCascadeClassifier.create("C:\\opencv_3.0\\opencv\\sources\\data\\haarcascades\\palm.xml");
+	        faceDetector = CudaCascadeClassifier.create(emm.ppath + "\\tracking\\haarcascade_frontalface_alt2.xml");
+	        faceDetector2 = CudaCascadeClassifier.create(emm.ppath + "\\tracking\\haarcascade_eye.xml");
+	        faceDetector3 = CudaCascadeClassifier.create(emm.ppath + "\\tracking\\haarcascade_upperbody.xml");
+	        faceDetector4 =CudaCascadeClassifier.create(emm.ppath + "\\tracking\\haarcascade_palm.xml");
 	        
 	        // Create an instance of Facemark
 	        facemark = FacemarkLBF.create();
 	 
 	        // Load landmark detector 
-	        facemark.loadModel("C:\\Users\\jitterhorse\\workspace\\cppCV2\\src\\main\\java\\org\\jitterhorse\\mav\\cppCV2\\lbfmodel.yaml");
+	        facemark.loadModel(emm.ppath + "\\tracking\\lbfmodel.yaml");
 	        
 	        (new Thread(this)).start();
 	    }
