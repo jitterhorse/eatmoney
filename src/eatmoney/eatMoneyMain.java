@@ -12,6 +12,7 @@ import calibrate.eatMoneyController;
 import controlP5.ControlP5;
 import enums.mode;
 import enums.status;
+import gamePTZ.Gamepad;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -34,14 +35,17 @@ public class eatMoneyMain extends PApplet {
 
 	FaceMark fm;
     VideoCaptureTool vidC;
+	public Gamepad GP;
 	
+	boolean firstinit = false; // if a first calibration was finished
+    
 	public int mainDisplayWidth = 1920;
 	
 	//create controller surface
 	eatMoneyController cont;
+	
 	//calibrate projector
 	public Calibrate cal;
-
 	public ArrayList<PShape> allPlanes;
 	
 	//mouse vars
@@ -66,11 +70,9 @@ public class eatMoneyMain extends PApplet {
 	
 	public status runStatus = status.PRE;
 	public mode showMode = mode.cam;
-	
-	int videoWidth = 1280;
-	int videoHeight = 720;
-	
 
+	
+	
 	public static void main(String[] args) {
 		PApplet.main("eatmoney.eatMoneyMain");
 	}
@@ -89,7 +91,7 @@ public class eatMoneyMain extends PApplet {
 		oscP5 = new OscP5(this,7000);	
 		butler = new Butler(this);
 	
-		
+		GP = new Gamepad(this);
 
 	}
 	
@@ -97,19 +99,23 @@ public class eatMoneyMain extends PApplet {
 		cal = new Calibrate(this,Planes,filename,newCalibration,mc);	
 	}
 	
+	
 	public void setupMain() {
-		Planes = cal.totalcount;
-		mc = createGraphics(1920*Planes,height,P3D);
-		
-		vidC = new VideoCaptureTool(this);
-		fm = new FaceMark(this,vidC.cam);
-		
-		
-		mc.stroke(0);
-		mc.perspective(radians(fov),(float)1920*Planes/(float)height,10,15000);
-		 
-		for(PShape p : cal.planeObjects) {
-			 p.setTexture(mc);
+		if(firstinit == false) {
+			Planes = cal.totalcount;
+			mc = createGraphics(1920*Planes,height,P3D);
+			
+			vidC = new VideoCaptureTool(this);
+			fm = new FaceMark(this,vidC.cam);
+			
+			
+			mc.stroke(0);
+			mc.perspective(radians(fov),(float)1920*Planes/(float)height,10,15000);
+			 
+			for(PShape p : cal.planeObjects) {
+				 p.setTexture(mc);
+			}
+			firstinit = true;
 		}
 
 		camTarget = new PVector(width/2.0f, height/2.0f,0);
@@ -121,6 +127,8 @@ public class eatMoneyMain extends PApplet {
 	
 	public void draw() {
 		 
+		GP.update();
+		
 		clear();
 		background(0);
 		
@@ -128,6 +136,7 @@ public class eatMoneyMain extends PApplet {
 			
 			
 		}
+		
 		else if(runStatus == status.CALI) {
 			  cal.drawPlanes();
 			  image(cal.cali,210,0);
@@ -137,7 +146,7 @@ public class eatMoneyMain extends PApplet {
 			  image(cal.preview,1920,0,cal.totalcount*1920,1080);
 			
 		}
-		else if(runStatus == status.RUN) {
+		else if(runStatus == status.RUN || runStatus == status.CAMPRE) {
 			if(mousePress == true){
 				  dx = (mouseclick.x - mouseX) * 0.01f;
 				  dy = (mouseclick.y - mouseY) * 0.01f;
@@ -200,9 +209,29 @@ public class eatMoneyMain extends PApplet {
 			  
 			  //show Control Content
 			  image(mc,0,0,960*Planes,540);
-			  image(vidC.getCameraImage(),640,340);
+			  image(vidC.getCameraImage(),1920-640,540,640,360);
+			  
+			  if(runStatus == status.CAMPRE) {
+					if(cont.st != null) {
+						pushMatrix();
+						fill(255,0,0,128);
+						noStroke();
+						rect(1920-370,540+130,100,100);
+						stroke(0);
+						noFill();
+						text("preset " + cont.st.num,1920-360,540+140);
+						popMatrix();
+						cont.st.lifetime -= 0.05;
+						if(cont.st.lifetime <= 0.) cont.st = null;
+						
+					}
+					
+				}
+			  
+			  
 			  //text("detection:" + fm.detections,1290,340);
 			  
+			  /*
 			  pushMatrix();
 			  translate(640,340);
 			  for (long i = 0; i < fm.landmarks.size(); i++) {
@@ -211,12 +240,12 @@ public class eatMoneyMain extends PApplet {
                       Point2f xop = v.get(j);
                       fill(255);
                       strokeWeight(4);
-                      point(xop.x(),xop.y());
+                      point(map(xop.x(),0,160,0,1280),map(xop.y(),0,120,0,720));
                   }
                  
 			  }
 			  popMatrix();
-			  
+			  */
 		}
 				
 		stroke(255,255);

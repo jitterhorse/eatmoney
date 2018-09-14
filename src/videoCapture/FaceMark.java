@@ -239,7 +239,7 @@ public class FaceMark implements Runnable{
 		public void run() {
 			System.out.println("fm started");
 			while(true) {
-				if(detection == true) {
+				if(detection == true && cap != null) {
 					detect();
 				}
 				else if(detection == false) {

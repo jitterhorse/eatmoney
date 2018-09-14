@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+import controlP5.Button;
 import controlP5.ControlEvent;
 import controlP5.ControlListener;
 import controlP5.ControlP5;
@@ -27,7 +28,7 @@ public class eatMoneyController {
 	PApplet parent;
 	ControlP5 cp;
 	MyControlListener myListener;
-	Group standard, calibrate, pre;
+	Group standard, calibrate, pre, camera;
 	
 	Toggle monitorT;
 	ScrollableList files;
@@ -35,9 +36,28 @@ public class eatMoneyController {
 	
 	Textlabel warning1;
 	
+	RadioButton r1, r2;
+	Button save;
+	
 	PFont font;
 	ArrayList<String> oldFiles;
 	
+	int currentPreset = 0;
+	
+	public saveTag st;
+	
+	
+	public class saveTag{
+		
+		public float lifetime = 1.f;
+		public int num;
+		
+		public saveTag(int _num) {
+			num = _num;
+			
+		}
+		
+	}
 	
 	public eatMoneyController(PApplet _parent, eatMoneyMain _em) {
 		parent = _parent;
@@ -47,8 +67,11 @@ public class eatMoneyController {
 		cp.setPosition(0, 0);
 		myListener = new MyControlListener();
 		loadFiles();
-
-		//preRequisites
+		
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////preRequisites
+		///////////////////////////////////////////////////////////////////
+		
 		pre = cp.addGroup("prerequisites")
                 .setPosition(0,560)
                 .setBackgroundHeight(450)
@@ -107,7 +130,10 @@ public class eatMoneyController {
 	
 	    cp.getController("Saved Files").addListener(myListener);
 	    
-		//Calibration gui
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////calibration planes
+		///////////////////////////////////////////////////////////////////
+	    
 		calibrate = cp.addGroup("calibrate")
                 .setPosition(0,560)
                 .setBackgroundHeight(450)
@@ -129,9 +155,56 @@ public class eatMoneyController {
 	     ;
 		calibrate.setVisible(false);
 		
+		cp.getController("closeCalibrate").addListener(myListener);
+		cp.getController("saveCalibrate").addListener(myListener);	
+
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////camera presets
+		///////////////////////////////////////////////////////////////////
+		
+		camera = cp.addGroup("camera")
+                .setPosition(0,560)
+                .setBackgroundHeight(450)
+                .setWidth(1000)
+                .setBackgroundColor(em.color(0))
+                .disableCollapse()
+                ;
+		
+		cp.addButton("close Presets")
+	     .setValue(0)
+	     .setPosition(10,10)
+	     .setSize(100,30)
+	     .setGroup(camera)
+	     ;
+		
+		for(int i = 0; i < 10; i++) {
+			cp.addButton("CamPre_"+i)
+		     .setValue(0)
+		     .setPosition(120,10+35*i)
+		     .setSize(100,30)
+		     .setGroup(camera)
+		     ;
+			cp.getController("CamPre_"+i).addListener(myListener);
+		}
+	
+		save = cp.addButton("savePreset")
+	     .setValue(0)
+	     .setPosition(230,10)
+	     .setSize(100,30)
+	     .setGroup(camera)
+	     .setVisible(false)
+	     ;
 		
 		
-		//Standard gui
+		camera.setVisible(false);
+		
+		cp.getController("close Presets").addListener(myListener);	
+		cp.getController("savePreset").addListener(myListener);	
+		
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////main gui
+		///////////////////////////////////////////////////////////////////
+		
 		standard = cp.addGroup("standard")
                 .setPosition(0,560)
                 .setBackgroundHeight(450)
@@ -143,14 +216,21 @@ public class eatMoneyController {
 		cp.addButton("openCalibrate")
 	     .setValue(0)
 	     .setPosition(10,10)
-	     .setSize(180,30)
+	     .setSize(100,30)
 	     .setGroup(standard)
 	     ;
 		
 		cp.addButton("new/open file")
 	     .setValue(0)
-	     .setPosition(200,10)
-	     .setSize(180,30)
+	     .setPosition(120,10)
+	     .setSize(100,30)
+	     .setGroup(standard)
+	     ;
+		
+		cp.addButton("cam presets")
+		 .setValue(0)
+	     .setPosition(230,10)
+	     .setSize(100,30)
 	     .setGroup(standard)
 	     ;
 		
@@ -159,12 +239,12 @@ public class eatMoneyController {
 		 
 	 cp.getController("openCalibrate").addListener(myListener);
 	 cp.getController("new/open file").addListener(myListener);
-	 cp.getController("closeCalibrate").addListener(myListener);
-	 cp.getController("saveCalibrate").addListener(myListener);
+	 cp.getController("cam presets").addListener(myListener);
 	}
 	
 	class MyControlListener implements ControlListener {
 		  public void controlEvent(ControlEvent theEvent) {
+			  
 		    if(theEvent.getController().getName().equals("openCalibrate")) {
 		    	openCalibrate();
 		    	calibrate.setVisible(true);
@@ -176,6 +256,33 @@ public class eatMoneyController {
 		    	calibrate.setVisible(false);
 		    	standard.setVisible(false);
 		    }
+		    else if(theEvent.getController().getName().equals("cam presets")) {
+		    	em.runStatus = enums.status.CAMPRE;
+		    	camera.setVisible(true);
+		    	standard.setVisible(false);
+		    } 
+		    else if(theEvent.getController().getName().contains("CamPre")) {
+		    	String s = theEvent.getController().getName();
+		    	s = s.substring(7,8);
+		    	currentPreset = Integer.parseInt(s);
+		    	em.GP.udp.recallPreset(currentPreset);
+		    	save.setPosition(230, 10+35*currentPreset);
+		    	save.setVisible(true);
+		    } 
+		    else if(theEvent.getController().getName().equals("savePreset")) {
+		    	em.GP.udp.savePreset(currentPreset);
+		    	st = new saveTag(currentPreset);
+		    	//save.setVisible(false);
+		    }  
+		    
+		    else if(theEvent.getController().getName().equals("close Presets")) {
+		    	camera.setVisible(false);
+		    	standard.setVisible(true);
+		    }	
+		    else if(theEvent.getController().getName().equals("presets")) {
+		    	System.out.println(theEvent.getValue());
+		    }		    
+		    
 		    else if(theEvent.getController().getName().equals("closeCalibrate")) {
 		    	closeCalibrate();
 		    	calibrate.setVisible(false);
@@ -223,6 +330,8 @@ public class eatMoneyController {
 		   
 		  }
 	  }
+	
+	
 	
 	private void openCalibrate() {
 		System.out.println("calibration start");
