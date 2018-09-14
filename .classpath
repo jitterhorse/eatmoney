@@ -5,6 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/controlp5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/processingVideo"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gamePad"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/pixelFlow"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/osc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/controlP5"/>

@@ -41,16 +41,16 @@ public class readData{
   
   public float [] deformMatrix = new float[8];
   
-  Butler butler;
+  ButlerObject butler;
   
   //init class
-  public readData( eatMoneyMain _em, Butler _butler) {
+  public readData( eatMoneyMain _em, ButlerObject _butler) {
 	this.em = _em;
 	this.butler = _butler;
 	audio = new AudioTool[2];
 	audio[0] = new AudioTool(em);
 	audio[1] = new AudioTool(em);
-	//openTake(idlestate);
+	openTake(idlestate);
   }
   
   public void initButler() {

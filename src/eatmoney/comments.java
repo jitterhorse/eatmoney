@@ -1,0 +1,156 @@
+package eatmoney;
+
+
+import java.io.*;
+import java.io.FileReader.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
+import processing.core.PApplet;
+import processing.core.PConstants;
+import processing.core.PFont;
+import processing.core.PGraphics;
+
+class comments{
+
+  ArrayList<commentar> commentare;
+  DataInputStream in;
+  String loadcomm;
+  PApplet parent;
+  PGraphics areaC;
+  int current = 0;
+  int textSize = 30;
+  
+  float scollPosY = 0;
+  PFont f;
+  
+  float totallinesFade = 0.f;
+  float totalcommentsFade = 0.f;
+  
+  int cWidth = 800;
+  int[] planeWidth = {cWidth - 10,cWidth - 30,cWidth - 50,cWidth - 70,cWidth - 90}; 
+  int[] textWidth = {cWidth - 20,cWidth - 40,cWidth - 60,cWidth - 80,cWidth - 100}; 
+  int[] shiftx = {0,20,40,60,80};
+  float distanceComments = 0.2f;
+  
+  public comments(PApplet _parent){
+   this.parent = _parent;
+   areaC = parent.createGraphics(cWidth,600,PConstants.P2D);
+   f = parent.createFont("Inconsolata Regular", 48);
+   areaC.textFont(f);
+   
+   //this.load();
+   scollPosY = areaC.height;
+  }
+
+  public int load(int file){
+    commentare = new ArrayList<commentar>();
+    current = 0;
+    BufferedReader br;
+    try {
+        
+        InputStream inputStream       = new FileInputStream(parent.sketchPath() +"\\comments\\comments_"+ file +".txt");
+        Reader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        br = new BufferedReader(inputStreamReader);
+        String line = br.readLine();
+
+        while (line != null) {
+        	String id = line.substring(0, 1);
+            String content = line.substring(2);
+            int layer = Integer.parseInt(id);
+            commentar uc = new commentar(layer,content,parent);
+            commentare.add(uc);
+            line = br.readLine();
+        }
+        
+        br.close();
+    }
+    catch (IOException e) {
+          e.printStackTrace();
+        } 
+    return commentare.size();
+  }
+  
+  public PGraphics draw(){
+   areaC.beginDraw();
+   areaC.clear();
+   areaC.translate(0,scollPosY);
+   
+   int totallines = 0;
+   int totalcomments = 0;
+
+   for(commentar c : commentare){
+     if(c.visible == true){
+         areaC.pushMatrix();
+         areaC.textFont(f);
+         areaC.textSize(textSize);
+         areaC.textLeading(textSize*0.8f);
+         if(c.alpha < 1.) c.addAlpha();
+         float alpha = c.alpha;
+         areaC.fill(255,190*alpha);
+         areaC.noStroke();
+         //shifty = (countComments * heightSpacebetweenComments) + (inbetweenlines * textLeading) + lines*lineheight
+         float shifty = (totalcomments * (textSize*distanceComments)) + totallines*(areaC.textAscent() + areaC.textDescent());
+         areaC.rect(5+shiftx[c.layer],shifty,planeWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()),5);  
+         areaC.fill(255,255*alpha);
+         areaC.stroke(255,255*alpha);
+         areaC.text(c.content,10+shiftx[c.layer],shifty,textWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()));   
+         areaC.popMatrix();
+         totallines += c.lines;
+         totalcomments++;
+         
+     }
+   }
+   totalcommentsFade = parent.lerp(totalcommentsFade,(float)totalcomments,0.7f);
+   totallinesFade = parent.lerp(totallinesFade,(float)totallines,0.7f);
+   scollPosY = areaC.height - ((totalcommentsFade *  (textSize*distanceComments))+ totallinesFade*(areaC.textAscent() + areaC.textDescent()));
+   areaC.endDraw();
+   return areaC;
+  }
+  
+  public void next(){
+      current++;
+      if(current > commentare.size()){
+        for(commentar c : commentare){
+         c.setVisible(false); 
+        }
+        current = 1;
+      }
+      else{
+        commentare.get(current-1).setVisible(true);
+        commentare.get(current-1).alpha = 0.f;
+      }
+  }
+
+
+  class commentar{
+	    boolean visible = false;
+	    String content;
+	    PApplet parent;
+	    int lines;
+	    float alpha = 0.f;
+	    int layer = 0;
+	    
+	    public commentar(int _layer, String _content,PApplet _parent){
+	      content = _content;
+	      parent = _parent;
+	      layer = _layer;
+	      parent.textFont(f);
+	      parent.textSize(textSize);
+	      float tw = parent.textWidth(content);
+	      lines = parent.ceil(tw/(float)textWidth[layer]);
+	    }
+	    
+	    public void setVisible(boolean v){
+	     visible = v; 
+	    }
+	    
+	    public void addAlpha(){
+	     alpha+= 0.05; 
+	    }
+  }
+
+}

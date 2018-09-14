@@ -5,22 +5,15 @@ import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 import static org.bytedeco.javacpp.opencv_imgproc.equalizeHist;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-
 import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.Loader;
-import org.bytedeco.javacpp.Pointer;
 import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_core.CvType;
 import org.bytedeco.javacpp.opencv_core.GpuMat;
-import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point2f;
 import org.bytedeco.javacpp.opencv_core.Point2fVector;
 import org.bytedeco.javacpp.opencv_core.Point2fVectorVector;
-import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.RectVector;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
@@ -28,8 +21,6 @@ import org.bytedeco.javacpp.opencv_core.UMat;
 import org.bytedeco.javacpp.opencv_cudaobjdetect.CudaCascadeClassifier;
 import org.bytedeco.javacpp.opencv_face.Facemark;
 import org.bytedeco.javacpp.opencv_face.FacemarkLBF;
-import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
-
 import eatmoney.eatMoneyMain;
 import processing.core.PImage;
 
@@ -54,6 +45,11 @@ public class FaceMark implements Runnable{
 	public int detections  = 0;
 	
 	public Point2fVectorVector landmarks = new Point2fVectorVector();
+	public RectVector faceVector = new RectVector();
+	public RectVector eyeVector = new RectVector();
+	public RectVector bodyVector = new RectVector();
+	public RectVector handVector = new RectVector();
+	
 	
 	public boolean detection = true;
 	
@@ -113,7 +109,7 @@ public class FaceMark implements Runnable{
 	            UMat graySmall = new UMat();
 	            frame.copyTo(gray);
 	       
-	            Size target = new Size(160,120);
+	            Size target = new Size(320,180);
 	            opencv_imgproc.resize(gray, graySmall, target );
 
 	            cvtColor(graySmall, graySmall, COLOR_BGR2GRAY);
@@ -131,10 +127,10 @@ public class FaceMark implements Runnable{
 	            faceDetector3.detectMultiScale(greyGpu, bodies);
 	            faceDetector4.detectMultiScale(greyGpu, hands);
 	            
-	            RectVector faceVector = new RectVector();
-	        	RectVector eyeVector = new RectVector();
-	        	RectVector bodyVector = new RectVector();
-	        	RectVector handVector = new RectVector();
+	            faceVector = new RectVector();
+	        	eyeVector = new RectVector();
+	        	bodyVector = new RectVector();
+	        	handVector = new RectVector();
 	        	faceDetector.convert(faces, faceVector);
 	        	faceDetector2.convert(eyes, eyeVector);
 	        	faceDetector3.convert(bodies, bodyVector);
@@ -155,7 +151,7 @@ public class FaceMark implements Runnable{
 	                opencv_imgproc.resize(frame,frameS,target);
 
 	                boolean success = facemark.fit(frameS, faceVector, landmarks);
-
+	                /*
 	                if(success) {
 	                    // If successful, render the landmarks on the face
 	                    for (long i = 0; i < landmarks.size(); i++) {
@@ -169,21 +165,18 @@ public class FaceMark implements Runnable{
 	                        drawFacemarks(frame, v, Scalar.YELLOW);
 	                    }
 	                }
+	                */
 	            }
 	            
 	            else {
 	            	landmarks = new Point2fVectorVector();
 	            }
-	            
-	            
-	          
-	            
+
 	        	int detections_num = (int) faceVector.size();
 	        	int detections_num_eye = (int) eyeVector.size();
 	        	int detections_num_bodies = (int) bodyVector.size();
 	        	int detections_num_hands = (int) handVector.size();
-	        	
-	        	detections =  detections_num;
+
 	        	/*
 	            if (!faces.empty()) {
 

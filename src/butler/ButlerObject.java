@@ -10,7 +10,7 @@ import java.util.HashMap;
 import butler.readData.State;
 import eatmoney.eatMoneyMain;
 
-public class Butler {
+public class ButlerObject {
 		
 		eatMoneyMain parent;
 	
@@ -39,6 +39,8 @@ public class Butler {
 		float rotX = PApplet.radians(0);
 		float rotY = PApplet.radians(180);	
 	
+		public PVector camoffset = new PVector(200,-10,-220);
+		
 		//testvars
 		public int[] testvars = {20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,189};
 		int[] delays = {2389,1147,2334,1412,1472,1489,1163,2476,1453,1989,4750,2422,2500,1740,2242,2332,2307,1688,1892,2045,2619,4456,1946,1927,0};
@@ -47,7 +49,7 @@ public class Butler {
 		
 		public int nextvid = 0;
 		
-		public Butler(eatMoneyMain _emm) {
+		public ButlerObject(eatMoneyMain _emm) {
 			this.parent = _emm;
 			setupHash();
 			butlerData = new readData(parent,this);
@@ -65,9 +67,10 @@ public class Butler {
 			if(butlerData.state == State.mix1 || butlerData.state == State.mix2 || butlerData.state == State.inmix){ 
 				 rawData = butlerData.readFrame();	 
 				 mc.pushMatrix();
-				 //mc.rotateX(rotX);
-				 //mc.rotateY(rotY);
-		
+				 mc.lightSpecular(124, 124, 124);
+				 mc.specular(12, 12, 0);
+				 mc.shininess(1);
+	
 				 butlerMin = new PVector(4500,4500,4500);
 				 butlerMax = new PVector(0,0,0);
 				  
@@ -91,6 +94,7 @@ public class Butler {
 				      p11 = depthToWorld(x+steps,y+steps,rawData[i11]);
 		
 				      mc.beginShape(PConstants.TRIANGLES);  
+				      mc.stroke(50);
 				      mc.fill(255);
 				      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && // check for non valid values
 				          (parent.abs(p00.z-p01.z) < max_edge_len) && (parent.abs(p10.z-p01.z) < max_edge_len) &&// check for edge length
@@ -155,7 +159,7 @@ public class Butler {
 			 }
 
 			  butlerMean.x = parent.lerp(butlerMin.x,butlerMax.x, 0.5f);
-			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.33f);
+			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.25f);
 			  butlerMean.z = parent.lerp(butlerMin.z,butlerMax.z, 0.5f);
 		}
 		
