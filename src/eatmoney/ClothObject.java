@@ -1,6 +1,7 @@
 package eatmoney;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.thomasdiewald.pixelflow.java.DwPixelFlow;
 import com.thomasdiewald.pixelflow.java.softbodydynamics.DwPhysics;
@@ -12,7 +13,10 @@ import com.thomasdiewald.pixelflow.java.softbodydynamics.softbody.DwSoftGrid3D;
 import com.thomasdiewald.pixelflow.java.utils.DwCoordinateTransform;
 import com.thomasdiewald.pixelflow.java.utils.DwStrokeStyle;
 
+import eatmoney.ClothObject.clothCenter;
 import enums.Follow;
+import enums.ObjectMode;
+import enums.mode;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
@@ -42,15 +46,8 @@ public class ClothObject {
 	  
 	  
 	  // entities to display
-	  boolean DISPLAY_PARTICLES      = false;
 	  boolean DISPLAY_MESH           = true;
-	  boolean DISPLAY_NORMALS        = false;
-	  boolean DISPLAY_SRPINGS        = false;
 	  boolean DISPLAY_GRID 		     = true;
-	  
-	  boolean DISPLAY_SPRINGS_STRUCT = true;
-	  boolean DISPLAY_SPRINGS_SHEAR  = true;
-	  boolean DISPLAY_SPRINGS_BEND   = true;
 	  
 	  boolean UPDATE_PHYSICS         = true;
 	  
@@ -61,11 +58,11 @@ public class ClothObject {
 	  
 	  PApplet parent;
 	  eatMoneyMain parentc;
-	  PGraphics2D  texture;
+	  PGraphics  texture;
 	  PShader tex,data;
 	  PShader dataLines;
-	  PShader vidTex;
-	  PShape object, videoPlane;
+
+	  PShape object;
 	  PShape shp_aabb;
 	  int packets = 400;
 	  float sizeObjects = 10.f;
@@ -73,6 +70,21 @@ public class ClothObject {
 	  
 	  PVector camCenter = new PVector(0,0,0);
 	  
+	  float easing = 1.f;
+	  
+	  public enum clothCenter{
+		  cloth,pin,emit,comment;
+
+		public static clothCenter random(){
+			clothCenter[] vias = {clothCenter.cloth,clothCenter.pin,clothCenter.emit};
+		    Random generator = new Random();
+		    return vias[generator.nextInt(vias.length)];
+		    }
+		  
+	  }
+	  
+	  clothCenter cc = clothCenter.cloth;
+	  ObjectMode displaymode = ObjectMode.run;
 	  
 	  boolean shake = false;
 	  int shakeCount = 0;
@@ -104,6 +116,8 @@ public class ClothObject {
 	  comments userC;
 	  
 	  ArrayList<CommentBlob> currentComments = new ArrayList<CommentBlob>();
+	  
+	  
 	  
 	  class CommentBlob{
 		  
@@ -141,26 +155,7 @@ public class ClothObject {
 		  
 		  
 	  }
-	  
-	  
-	  VideoBlob vb;
-	  
-	  class VideoBlob{
-		  
-		  int id;
-		  PVector position;
-		  boolean visible = true;
-		  float lifetime = 0.f;
-		  boolean impact = false;
-		  boolean close = false;
-		  
-		  public VideoBlob() {
-			  id = (int) Math.floor(Math.random() * (nodecount*nodecount));
-			  position = new PVector((float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500);
-		  }
-		  
-	  }
-	  
+	    
 	  
 	  public ClothObject(PGraphics _target, PApplet _parent, eatMoneyMain _parentc) {
 		  parent = _parent;
@@ -171,13 +166,13 @@ public class ClothObject {
 		  
 		  userC = new comments(parent);
 		  
-		  texture = (PGraphics2D) parent.createGraphics(1000,1000,PConstants.P2D);
+		  texture = parent.createGraphics(1000,1000,PConstants.P2D);
 		  tex = parent.loadShader("shader\\datatexture.glsl");
 		  data = parent.loadShader("shader\\packetsF2.glsl","shader\\packetsV2.glsl");
 		  dataLines = parent.loadShader("shader\\dataLinesF.glsl");
-		  vidTex = parent.loadShader("shader\\bloodyF2.glsl","shader\\bloodyV.glsl");
+
 		  createObj();
-		  createVidPlane();
+
 		  setupPhysics();
 	  }
 	  
@@ -212,7 +207,7 @@ public class ClothObject {
 	  
 	  public void calcCloth() {
 		  
-		  if(Math.random() > 1.99) {
+		  if(parentc.showMode == mode.cloth && Math.random() > 0.99) {
 			  reState();
 		  }
 		  
@@ -382,19 +377,25 @@ public class ClothObject {
 	
 	  public void drawCloth(PGraphics target) {
 		  
-		  target.pushMatrix();
+		  DISPLAY_MESH = true;
+		  if(cc == clothCenter.comment) {
+			DISPLAY_MESH = false;
+		  }
 		  
 		  if(DISPLAY_MESH){
+			  target.pushMatrix();
 		      for(DwSoftBody3D body : softbodies){
 		    	body.createShapeMesh(target);		    	
 		        body.displayMesh(target);
 		   
 		      }
+		      target.popMatrix();
 		    }
-		  target.popMatrix();
 		  
-		  target.pushMatrix();
+		  
+		  
 		    if(DISPLAY_GRID) {
+		    	target.pushMatrix();
 		    	for(DwSoftBody3D body : softbodies){
 				    DwStrokeStyle styleS = new DwStrokeStyle();
 				    styleS.stroke_weight = 1;
@@ -407,12 +408,11 @@ public class ClothObject {
 			        target.translate(0,0,800);
 			        body.displayWireframe(target);
 			      }
-		    	
+		    	target.popMatrix();
 		    }
-		   target.popMatrix();
 		   
-		   target.pushMatrix();
 		   
+		    target.pushMatrix();
 		    for(GridExpose g : currentExposes) {
 		    	if(g.offset < 0 && g.lifetime > 0.) {
 		    		PVector pos = new PVector(particles[g.id].cx,particles[g.id].cy,particles[g.id].cz);
@@ -450,11 +450,9 @@ public class ClothObject {
 		    		g.offset--;
 		    	}
 		    }
-		    
 		    target.popMatrix();
 		    
-		    target.pushMatrix();
-		    
+		    target.pushMatrix();		    
 		    for(textBadge tb : currentBadges) {
 		    		
 		    		PVector pos = new PVector(particles[tb.id].cx,particles[tb.id].cy,particles[tb.id].cz);
@@ -474,56 +472,12 @@ public class ClothObject {
 		    
 		    target.popMatrix();
 		    
-		    
-		    target.pushMatrix();
-		    //draw Video Point
-		    if(vb != null && vb.visible == true) {
-		    	
-			    target.pushMatrix();
-			    PVector pos = new PVector(particles[vb.id].cx,particles[vb.id].cy,particles[vb.id].cz);
-			    target.strokeWeight(1);
-			    target.stroke(128,255);
-			    target.line(pos.x,pos.y,pos.z,vb.position.x,vb.position.y,vb.position.z);  
 
-			   
-			    
-			    //vidTex.set("time", (parentc.frameCount * 0.1f));
-			    //vidTex.set("vidtextureold", parentc.vidC.getLastImage());
-				
-				if(parentc.vidC.dotracking == true) {
-					target.endDraw();
-					parentc.vidC.drawTrackings();
-					target.beginDraw();
-				}
-
-				PMatrix3D mat = ((PGraphics3D)target).cameraInv;
-			    mat.m03 = vb.position.x;
-			    mat.m13 = vb.position.y;
-			    mat.m23 = vb.position.z;
-
-				target.applyMatrix(mat);
-				    
-				target.scale(vb.lifetime*1000.f, vb.lifetime * 1000.f,1.f);
-				
-			    vidTex.set("vidtexture", parentc.vidC.getCameraImage());
-			    vidTex.set("blurmix", 0.f);
-			    vidTex.set("tracktexture", parentc.vidC.getTrackingImage());
-
-			    target.shader(vidTex);
-			    target.shape(videoPlane);
-			    target.resetShader();
-			    target.popMatrix();
-			  
-		    }
-		    target.popMatrix();
-
-		    
-			 target.pushMatrix();
+		
 			 TB.drawBadges(target);
-			 target.popMatrix(); 
+			
 		    
 		    
-		  target.pushMatrix();
 		  
 		  if(currentComments.size() > 0) {
 			  CommentBlob c = currentComments.get(currentComments.size()-1);
@@ -547,7 +501,6 @@ public class ClothObject {
 			  if(c.active == false) currentComments.remove(c);  
 		  	}   
 		  
-		 target.popMatrix();
 		 
 
 	  }
@@ -568,11 +521,12 @@ public class ClothObject {
 		  texture.beginDraw();
 		  texture.clear();
 		  tex.set("iTime",parent.frameCount*0.01f);
+		  tex.set("thresh", easing);
 		  texture.shader(tex);
 		  texture.rect(0,0,parent.width,parent.height);
 		  texture.resetShader();
-		  texture.fill(120,255);
-		  texture.rect(0, 0, parent.width, parent.height);
+		  //texture.fill(120,255);
+		  //texture.rect(0, 0, parent.width, parent.height);
 		  texture.endDraw();			  
 	  }
 	  
@@ -663,9 +617,9 @@ public class ClothObject {
 		    styleS.stroke_weight = 1;
 		    styleS.stroke_color = 255;
 		    cloth.createShapeWireframe(parent.g, styleS);
-		    cloth.texture_XYp = texture;
-		    //cloth.texture_XYn = texture;
-		   
+		    cloth.texture_XYp = (PGraphics2D) texture;
+		    cloth.texture_XYn = (PGraphics2D) texture;
+
 
 		    
 		    // fix all 4 corners
@@ -698,22 +652,7 @@ public class ClothObject {
 		     object.endShape();
 		 }
 	  
-	  void createVidPlane() {
-		  	videoPlane = parent.createShape();
-		  	videoPlane.beginShape(PConstants.QUADS);
-		  	videoPlane.noStroke();
-		  	videoPlane.fill(255);
-		  	videoPlane.normal(0,0, -1);
-		  	videoPlane.vertex(-0.64f,-0.36f,0,0);
-		  	videoPlane.normal(0, 0, -1);
-		  	videoPlane.vertex(-0.64f,0.36f,0,0,1);
-		  	videoPlane.normal(0, 0, -1);
-		  	videoPlane.vertex(0.64f,0.36f,0,1,1); 
-		  	videoPlane.normal(0, 0, -1);
-		  	videoPlane.vertex(0.64f,-0.36f,0,1,0);
 
-		  	videoPlane.endShape();
-		 }
 
 	  
 	  // sticks with particles sitting on cloth
@@ -835,35 +774,7 @@ public class ClothObject {
 		return middle;
 	}
 
-	public PVector getVideoMiddle() {
-		PVector middle = new PVector(0,0,0);
-		middle = vb.position;
-		
-		PVector currentCamPos = parentc.middleSlidePos;
-		float d = middle.dist(currentCamPos);
-		
-		if(vb.close == false) {
-			
-			if(d < 200. && vb.lifetime < 1. && vb.impact == false ) {
-				vb.lifetime+= 0.01;
-				if(vb.lifetime >= 1.) {
-					vb.impact = true;
-				}
-			}
-		}
-		
-		else if(this.vb.close == true) {
-	    	vb.lifetime -= 0.01;
-	    	if(vb.lifetime <= 0.) { 
-	    		vb.visible = false;
-	    		parentc.follow = Follow.cloth;
-	    		vb = null;
-	    	}
-	    }
-			
-
-		return middle;
-	}
+	
 	
 	public void shake() {
 		shake = true;
@@ -904,20 +815,16 @@ public class ClothObject {
 			CommentBlob c = new CommentBlob(rand);
 			currentComments.add(c);
 		}
-		DISPLAY_MESH = false;
+
 	}
 	
-	public void newVideoBlob(int channel) {
-		vb = new VideoBlob();	
+	public void stopComment() {
+		currentComments = new ArrayList<CommentBlob>();
+		
 	}
 	
-	public void closeVideoBlob() {
-		this.vb.close = true;
-	}
-	
-	
-	public PGraphics drawComments() {
-		return userC.draw();	
+	public PGraphics drawComments(PGraphics target) {
+		return userC.draw(target);	
 	}
 
 	public void drawOutline(PGraphics target) {
@@ -982,6 +889,8 @@ public class ClothObject {
 	    target.shape(shp_aabb);
 
 	  }
+
+
 
   
 }

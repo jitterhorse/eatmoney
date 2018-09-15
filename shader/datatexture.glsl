@@ -1,7 +1,7 @@
 uniform float iTime;
 uniform vec2 resolution;
 uniform sampler2D texture;
-
+uniform float thresh;
 
 float noiseish(vec2 coord, vec2 coordMultiplier1, vec2 coordMultiplier2, vec2 coordMultiplier3, vec3 timeMultipliers) {
     return 0.333 * (sin(dot(coordMultiplier1, coord) + timeMultipliers.x * iTime) + sin(dot(coordMultiplier2, coord) + timeMultipliers.y * iTime) + sin(dot(coordMultiplier3, coord) + timeMultipliers.z * iTime));
@@ -41,6 +41,7 @@ void main()
     const float borderDistance = 0.45; // 0.5 = all the way to the edge of the cell
     v = max(v, max(smoothstep(-borderSmoothingWidth, borderSmoothingWidth, abs(centeredLocalUV.x) - borderDistance), smoothstep(-borderSmoothingWidth, borderSmoothingWidth, abs(centeredLocalUV.y) - borderDistance)));
     v*=0.8;
-    float alpha = 1.;
+
+    float alpha = thresh;
     gl_FragColor = vec4(v, v, v, alpha);
 }

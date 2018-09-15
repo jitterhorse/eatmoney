@@ -12,11 +12,16 @@ public class LightRig {
 	boolean blackout = false;
 	float multi = 1.f;
 	float direction = -1.f;
-	float speed = 0.2f;
+	float speed = 0.05f;
+	float changespeed = 0.02f;
 	
 	LightCol PL = new LightCol(255,255,255,255,-1000, -1000, -100);
 	LightCol AL = new LightCol(255,96,96,255);
 	LightCol DL = new LightCol(210,210,210,255,-1, -1.5f, -2);
+	
+	LightCol PLnew = new LightCol(255,255,255,255,-1000, -1000, -100);
+	LightCol ALnew = new LightCol(255,96,96,255);
+	LightCol DLnew = new LightCol(210,210,210,255,-1, -1.5f, -2);
 	
 	class LightCol {	
 		float r;
@@ -53,6 +58,16 @@ public class LightRig {
 	
 	
 	public void doLight() {
+		DL.r = parent.lerp(DL.r,DLnew.r,changespeed);
+		DL.g = parent.lerp(DL.g,DLnew.g,changespeed);
+		DL.b = parent.lerp(DL.b,DLnew.b,changespeed);
+		
+		AL.r = parent.lerp(AL.r,ALnew.r,changespeed);
+		AL.g = parent.lerp(AL.g,ALnew.g,changespeed);
+		AL.b = parent.lerp(AL.b,ALnew.b,changespeed);
+				
+		
+		
 		target.pointLight(parent.abs(parent.sin(parent.frameCount*0.001f)*PL.r), parent.abs(parent.cos(parent.frameCount*0.003f)*PL.g), parent.abs(1.f-parent.cos(parent.frameCount*0.005f)*PL.b), PL.pos.x, PL.pos.y, PL.pos.z);    
 		target.ambientLight(parent.abs(parent.cos(parent.frameCount*0.001f)*AL.r*multi), AL.g, AL.g);
 		target.directionalLight(DL.r*multi, DL.g*multi, DL.b*multi, DL.pos.x, DL.pos.y, DL.pos.z);

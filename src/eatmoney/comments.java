@@ -22,7 +22,7 @@ class comments{
   PApplet parent;
   PGraphics areaC;
   int current = 0;
-  int textSize = 30;
+  int textSize = 50;
   
   float scollPosY = 0;
   PFont f;
@@ -30,7 +30,7 @@ class comments{
   float totallinesFade = 0.f;
   float totalcommentsFade = 0.f;
   
-  int cWidth = 800;
+  int cWidth = 1200;
   int[] planeWidth = {cWidth - 10,cWidth - 30,cWidth - 50,cWidth - 70,cWidth - 90}; 
   int[] textWidth = {cWidth - 20,cWidth - 40,cWidth - 60,cWidth - 80,cWidth - 100}; 
   int[] shiftx = {0,20,40,60,80};
@@ -38,7 +38,7 @@ class comments{
   
   public comments(PApplet _parent){
    this.parent = _parent;
-   areaC = parent.createGraphics(cWidth,600,PConstants.P2D);
+   areaC = parent.createGraphics(cWidth,800,PConstants.P2D);
    f = parent.createFont("Inconsolata Regular", 48);
    areaC.textFont(f);
    
@@ -74,7 +74,8 @@ class comments{
     return commentare.size();
   }
   
-  public PGraphics draw(){
+  public PGraphics draw(PGraphics target){
+   target.endDraw();
    areaC.beginDraw();
    areaC.clear();
    areaC.translate(0,scollPosY);
@@ -108,6 +109,7 @@ class comments{
    totallinesFade = parent.lerp(totallinesFade,(float)totallines,0.7f);
    scollPosY = areaC.height - ((totalcommentsFade *  (textSize*distanceComments))+ totallinesFade*(areaC.textAscent() + areaC.textDescent()));
    areaC.endDraw();
+   target.beginDraw();
    return areaC;
   }
   

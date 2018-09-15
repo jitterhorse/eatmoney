@@ -65,8 +65,9 @@ public class readData{
   
   public void openTake(int p) {
 	
-	int delay = butler.butlerDelays.get(p).intValue();
-	  
+	int delay = butler.butlerDelays.get(p).getDelay();
+	int file =  butler.butlerDelays.get(p).getFile();
+	
 	int target = 0;  
 	if(this.state == State.mix1) target = 1;
 	else if(this.state == State.inmix) {
@@ -78,7 +79,7 @@ public class readData{
 		
 	frame[target] = 0;
 	maxCount[target] = 0;
-    this.path[target] = em.ppath + "\\data\\recording_" + p;
+    this.path[target] = em.ppath + "\\data\\recording_" + file;
     try{ 
 	    Stream<Path> files = Files.list(Paths.get(this.path[target]));
 	    maxCount[target] = (int)files.count()-1; //one is soundfile 

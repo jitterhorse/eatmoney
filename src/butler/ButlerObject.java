@@ -4,11 +4,14 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PVector;
+import processing.data.JSONArray;
+import processing.data.JSONObject;
 
 import java.util.HashMap;
 
 import butler.readData.State;
 import eatmoney.eatMoneyMain;
+import enums.ObjectMode;
 
 public class ButlerObject {
 		
@@ -30,24 +33,42 @@ public class ButlerObject {
 		int       kdh = 424;
 		int       kdw = 512;
 		int       max_edge_len = 25;
-		int steps = 2;
+		public int steps = 2;
 		
 		float depthscale = 0.7f;
 		float minRange = 500;
 		float maxRange = 1800 * depthscale;
 		
-		float rotX = PApplet.radians(0);
-		float rotY = PApplet.radians(180);	
+		public PVector ButlerOffset = new PVector(1500,0,-1500);
 	
 		public PVector camoffset = new PVector(200,-10,-220);
 		
-		//testvars
-		public int[] testvars = {20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,189};
-		int[] delays = {2389,1147,2334,1412,1472,1489,1163,2476,1453,1989,4750,2422,2500,1740,2242,2332,2307,1688,1892,2045,2619,4456,1946,1927,0};
+		HashMap<Integer, Offset> butlerDelays = new HashMap<Integer, Offset>();
 		
-		HashMap<Integer, Integer> butlerDelays = new HashMap<Integer, Integer>();
+		public int nextvid = 20;
 		
-		public int nextvid = 0;
+		public float easing = 0.f;
+		public ObjectMode displaymode = ObjectMode.off;
+		
+		public class Offset{		
+			int file;
+			int offset;
+			
+			public Offset(int _file, int _offset) {
+				file = _file;
+				offset = _offset;
+			}
+			
+			public int getDelay() {
+				return offset;
+			}
+			
+			public int getFile() {
+				return file;
+			}
+			
+		}
+		
 		
 		public ButlerObject(eatMoneyMain _emm) {
 			this.parent = _emm;
@@ -56,9 +77,16 @@ public class ButlerObject {
 		}
 		
 		private void setupHash(){
-			for(int i = 0; i < testvars.length; i++) {
-				butlerDelays.put(testvars[i],delays[i]);
+			JSONArray offsets = parent.loadJSONArray("data\\offset.json");
+
+			for(int i = 0; i < offsets.size(); i++) {
+				JSONObject jo = offsets.getJSONObject(i);
+				Offset off = new Offset(jo.getInt("num"),jo.getInt("delay"));
+				butlerDelays.put(jo.getInt("id"),off);
 			}
+			Offset off = new Offset(189,0);
+			butlerDelays.put(189,off);
+			
 		}
 		
 
@@ -67,13 +95,21 @@ public class ButlerObject {
 			if(butlerData.state == State.mix1 || butlerData.state == State.mix2 || butlerData.state == State.inmix){ 
 				 rawData = butlerData.readFrame();	 
 				 mc.pushMatrix();
-				 mc.lightSpecular(124, 124, 124);
+				 mc.translate(ButlerOffset.x, ButlerOffset.y,ButlerOffset.z);
+				 mc.lightSpecular(24, 24, 24);
 				 mc.specular(12, 12, 0);
-				 mc.shininess(1);
+				 mc.shininess(0);
 	
 				 butlerMin = new PVector(4500,4500,4500);
 				 butlerMax = new PVector(0,0,0);
-				  
+	 
+				 float stepadd = parent.map(easing,0.f,1.f,28.f,0.f);
+				 if(stepadd < 0.) stepadd = 0.f;
+				 else if(stepadd > 28.) stepadd = 28.f;
+				 
+				 steps = 2;
+				 steps += parent.floor(stepadd);
+				 
 				 for(int y=0; y < kdh-steps;y+=steps)
 				  {
 					int y_kdw = y * kdw; 
@@ -93,9 +129,11 @@ public class ButlerObject {
 				      p10 = depthToWorld(x+steps,y,rawData[i10]);
 				      p11 = depthToWorld(x+steps,y+steps,rawData[i11]);
 		
-				      mc.beginShape(PConstants.TRIANGLES);  
-				      mc.stroke(50);
-				      mc.fill(255);
+				      mc.beginShape(PConstants.TRIANGLES);
+				      mc.strokeWeight(1);
+				      float ease = (Math.random() < easing) ? 1.f : 0.f;
+				      mc.stroke(90);
+				      mc.fill(255*ease,255*ease);
 				      if ((p00.z > 0) && (p01.z > 0) && (p10.z > 0) && // check for non valid values
 				          (parent.abs(p00.z-p01.z) < max_edge_len) && (parent.abs(p10.z-p01.z) < max_edge_len) &&// check for edge length
 				          (p00.z < maxRange) && p00.z > minRange) {  // depth cut
