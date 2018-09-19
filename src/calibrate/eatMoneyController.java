@@ -28,7 +28,7 @@ public class eatMoneyController {
 	PApplet parent;
 	ControlP5 cp;
 	MyControlListener myListener;
-	Group standard, calibrate, pre, camera;
+	Group standard, calibrate, pre, camera, interaction;
 	
 	Toggle monitorT;
 	ScrollableList files;
@@ -43,6 +43,7 @@ public class eatMoneyController {
 	ArrayList<String> oldFiles;
 	
 	int currentPreset = 0;
+	int currentComment = 0;
 	
 	public saveTag st;
 	
@@ -200,6 +201,97 @@ public class eatMoneyController {
 		
 		cp.getController("close Presets").addListener(myListener);	
 		cp.getController("savePreset").addListener(myListener);	
+
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////interaction
+		///////////////////////////////////////////////////////////////////
+		
+		interaction = cp.addGroup("interaction")
+                .setPosition(0,560)
+                .setBackgroundHeight(450)
+                .setWidth(500)
+                .setBackgroundColor(em.color(0))
+                .disableCollapse()
+                ;
+		
+		cp.addButton("close interaction")
+	     .setValue(0)
+	     .setPosition(10,10)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;
+
+		cp.addButton("tracking")
+	     .setValue(0)
+	     .setPosition(120,10)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;
+		
+		cp.addButton("reset cloth")
+	     .setValue(0)
+	     .setPosition(120,50)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;		
+
+		cp.addButton("setAL")
+	     .setValue(0)
+	     .setPosition(120,140)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;	
+		
+		cp.addButton("setDL")
+	     .setValue(0)
+	     .setPosition(120,180)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;	
+		
+		cp.addButton("setPL")
+	     .setValue(0)
+	     .setPosition(120,220)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;	
+		cp.getController("setPL").addListener(myListener);
+		cp.getController("setDL").addListener(myListener);
+		cp.getController("setAL").addListener(myListener);
+		
+		for(int i = 1; i <= 11; i++) {
+			cp.addButton("comment_"+i)
+		     .setValue(0)
+		     .setPosition(230,10+35*i)
+		     .setSize(100,30)
+		     .setGroup(interaction)
+		     ;
+			cp.getController("comment_"+i).addListener(myListener);
+		}
+		
+		  cp.addSlider("clothstate")
+		     .setPosition(350,10)
+		     .setSize(20,300)
+		     .setRange(0,100)
+		     .setValue(0)
+		     .setGroup(interaction)
+		     ;
+		  
+		  cp.addSlider("damp")
+		     .setPosition(450,10)
+		     .setSize(20,300)
+		     .setRange(600,1000)
+		     .setValue(995)
+		     .setGroup(interaction)
+		     ;	
+		  
+		cp.getController("tracking").addListener(myListener);	
+		cp.getController("close interaction").addListener(myListener);
+		cp.getController("clothstate").addListener(myListener);
+		cp.getController("reset cloth").addListener(myListener);
+		
+		
+		interaction.setVisible(false);
 		
 		///////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////main gui
@@ -234,12 +326,21 @@ public class eatMoneyController {
 	     .setGroup(standard)
 	     ;
 		
+		cp.addButton("interact")
+		 .setValue(0)
+	     .setPosition(10,60)
+	     .setSize(100,30)
+	     .setGroup(standard)
+	     ;	
+		
 		standard.setVisible(false);
 		
 		 
 	 cp.getController("openCalibrate").addListener(myListener);
 	 cp.getController("new/open file").addListener(myListener);
 	 cp.getController("cam presets").addListener(myListener);
+	 cp.getController("interact").addListener(myListener);
+	 
 	}
 	
 	class MyControlListener implements ControlListener {
@@ -261,6 +362,24 @@ public class eatMoneyController {
 		    	camera.setVisible(true);
 		    	standard.setVisible(false);
 		    } 
+		    else if(theEvent.getController().getName().equals("interact")) {
+		    	standard.setVisible(false);
+		    	interaction.setVisible(true);
+		    }		    
+		    else if(theEvent.getController().getName().contains("comment")) {
+		    	String s = theEvent.getController().getName();
+		    	s = s.substring(8,s.length());
+		    	currentComment = Integer.parseInt(s);
+		    	em.startComments(currentComment);
+		    }
+		    else if(theEvent.getController().getName().contains("clothstate")) {
+		    	float f = theEvent.getController().getValue();
+		    	em.generalState = (float)f/(float)100.;
+		    }
+		    else if(theEvent.getController().getName().contains("damp")) {
+		    	em.co.param_cloth_particle.DAMP_VELOCITY  = em.map(theEvent.getController().getValue(),600,1000,0.6f,1.f); 
+		    }
+		    
 		    else if(theEvent.getController().getName().contains("CamPre")) {
 		    	String s = theEvent.getController().getName();
 		    	s = s.substring(7,8);
@@ -278,6 +397,7 @@ public class eatMoneyController {
 		    else if(theEvent.getController().getName().equals("close Presets")) {
 		    	camera.setVisible(false);
 		    	standard.setVisible(true);
+		    	em.runStatus = enums.status.RUN;
 		    }	
 		    else if(theEvent.getController().getName().equals("presets")) {
 		    	System.out.println(theEvent.getValue());
@@ -326,7 +446,28 @@ public class eatMoneyController {
 		    	calibrate.setVisible(true);
 		    	em.runStatus = enums.status.CALI;
 		    }
+		    else if(theEvent.getController().getName().equals("tracking")) {
+		    	em.fm.detection = !em.fm.detection;
+		    }
+		    else if(theEvent.getController().getName().equals("reset cloth")) {
+		    	em.co.resetCloth();
+		    }
 		    
+		    else if(theEvent.getController().getName().equals("setAL")) {
+		    	em.lightRig.ALset = ! em.lightRig.ALset;
+		    }
+		    else if(theEvent.getController().getName().equals("setPL")) {
+		    	em.lightRig.PLset = ! em.lightRig.PLset;
+		    }
+		    else if(theEvent.getController().getName().equals("setDL")) {
+		    	em.lightRig.DLset = ! em.lightRig.DLset;
+		    }
+		    
+		    
+		    else if(theEvent.getController().getName().equals("close interaction")) {
+		    	interaction.setVisible(false);
+		    	standard.setVisible(true);
+		    }		    
 		   
 		  }
 	  }

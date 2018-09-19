@@ -13,7 +13,7 @@ import processing.opengl.PShader;
 public class VideoObject {
 
 	eatMoneyMain parent;
-	PShader vidTex;	
+	PShader vidTex,vidTex2;	
 	VideoBlob vb;
 	PShape videoPlane;
 	ObjectMode displaymode = ObjectMode.off;
@@ -21,16 +21,20 @@ public class VideoObject {
 	  
 	  class VideoBlob{
 		  
+		  int mode = 0; // viewsize
 		  int id;
 		  PVector position;
 		  boolean visible = true;
 		  float lifetime = 0.f;
 		  boolean impact = false;
 		  boolean close = false;
+		  int shader = 0;
 		  
-		  public VideoBlob(int nodecount) {
+		  public VideoBlob(int nodecount,int _mode,int _shader) {
 			  id = (int) Math.floor(Math.random() * (nodecount));
 			  position = new PVector((float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500);
+			  mode = _mode;
+			  shader = _shader;
 		  }
 		  
 	  }
@@ -39,7 +43,10 @@ public class VideoObject {
 		  parent = _emm;
 		  createVidPlane();
 		  vidTex = parent.loadShader("shader\\bloodyF2.glsl","shader\\bloodyV.glsl");
+		  vidTex2 = parent.loadShader("shader\\algorithmF.glsl","shader\\bloodyV.glsl");
 	}
+	
+	
 	
 	
 	public void drawVideo(PGraphics target) {
@@ -67,18 +74,36 @@ public class VideoObject {
 		    mat.m13 = vb.position.y;
 		    mat.m23 = vb.position.z;
 
-			target.applyMatrix(mat);
-			    
-		    
-			target.scale(vb.lifetime*1000.f, vb.lifetime * 1000.f,1.f);
+			float scale = 800.f;
+			float rotate = 0.f;
+			if(vb.mode == 1) {
+				scale = 600.f;
+				rotate = 0.1f*PConstants.PI;
+			}
 			
-		    vidTex.set("vidtexture", parent.vidC.getCameraImage());
+			mat.m00 += rotate *vb.lifetime;
+			target.applyMatrix(mat);
+			
+			
+			target.scale(vb.lifetime*scale, vb.lifetime * scale,1.f);
+			
+			if(vb.shader == 1) {
+		    vidTex2.set("vidtexture", parent.vidC.getCameraImage());
+		    vidTex2.set("tracktexture", parent.vidC.getTrackingImage());
+		    target.shader(vidTex2);
+			}
+			else if (vb.shader == 2) {
+			vidTex.set("vidtexture", parent.vidC.getCameraImage());
+			vidTex.set("tracktexture", parent.vidC.getTrackingImage());		  
 		    vidTex.set("blurmix", 0.f);
-		    vidTex.set("tracktexture", parent.vidC.getTrackingImage());
-
 		    target.shader(vidTex);
+			}
+		   
 		    target.shape(videoPlane);
-		    target.resetShader();
+		    
+		    if(vb.shader != 0) {
+		    	target.resetShader();
+		    }
 		    target.popMatrix();
 	    }
 	}
@@ -93,9 +118,9 @@ public class VideoObject {
 	}
 	
 	
-	public void newVideoBlob(int channel,int particlecount) {
+	public void newVideoBlob(int channel,int particlecount,int mode,int shader) {
 		//todo: swicth video channel automatically
-		vb = new VideoBlob(particlecount);	
+		vb = new VideoBlob(particlecount,mode,shader);	
 	}
 	
 	public void closeVideoBlob() {

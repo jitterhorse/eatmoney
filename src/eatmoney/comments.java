@@ -96,8 +96,8 @@ class comments{
          //shifty = (countComments * heightSpacebetweenComments) + (inbetweenlines * textLeading) + lines*lineheight
          float shifty = (totalcomments * (textSize*distanceComments)) + totallines*(areaC.textAscent() + areaC.textDescent());
          areaC.rect(5+shiftx[c.layer],shifty,planeWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()),5);  
-         areaC.fill(255,255*alpha);
-         areaC.stroke(255,255*alpha);
+         areaC.fill(0,255*alpha);
+         areaC.stroke(0,255*alpha);
          areaC.text(c.content,10+shiftx[c.layer],shifty,textWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()));   
          areaC.popMatrix();
          totallines += c.lines;

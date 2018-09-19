@@ -133,7 +133,7 @@ public class textBadges {
 		PGraphics textImg; 
 		int id = 0;
 		float offset;
-		String[] tagwords = {"nord-EU","OC","oceancities","LTEM","LET_THE_MEAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU"};
+		String[] tagwords = {"nord-EU","OC","oceancities","LTEM","LET_THEM_EAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU","HPP","CONNST","ROSSER","ROLOEG"};
 		
 		
 		
@@ -154,7 +154,7 @@ public class textBadges {
 			   for (int i = 0; i < leng; i++){
 			     int len = main.ceil(main.random(20));
 			     s = generateString(rndm,"abcdefghei127831985623508-.,",len);
-			     if(main.random(1.f) > 0.90f) {
+			     if(main.random(1.f) > 0.70f) {
 			    	 String insert = tagwords[main.floor(main.random(tagwords.length))];
 			    	 int insertpoint = main.floor(main.random(s.length()));
 			    	 s = s.substring(0, insertpoint) + "-" + insert  + "_" + s.substring(insertpoint, s.length());

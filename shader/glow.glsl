@@ -2,8 +2,8 @@ uniform float iGlobalTime;
 uniform vec2 iResolution;
 uniform sampler2D texture;
  
-const float blurSize = 1.0/50.0;
-const float intensity = 0.1;
+const float blurSize = 1.0/500.0;
+const float intensity = 0.3;
 
 void main()
 {
@@ -34,6 +34,7 @@ void main()
    sum += texture2D(texture, vec2(texcoord.x, texcoord.y + 4.0*blurSize)) * 0.05;
    sum += texture2D(texture, vec2(texcoord.x, texcoord.y + 5.0*blurSize)) * 0.02;
    
-   gl_FragColor = sum*(intensity+cos(iGlobalTime)*0.2) + texture2D(texture, texcoord);
- 
+   vec4 bl = sum*(intensity+cos(iGlobalTime)*0.2);
+   vec4 nor = texture2D(texture, vec2(texcoord.x, texcoord.y));
+   gl_FragColor = nor + bl;
 }

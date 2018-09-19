@@ -12,6 +12,7 @@ import enums.Follow;
 import enums.mode;
 import enums.status;
 import gamePTZ.Gamepad;
+import midi.MidiMixer;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -33,7 +34,9 @@ public class eatMoneyMain extends PApplet {
 	OscP5 oscP5;
 	NetAddress myRemoteLocation;
 	ControlP5 mainControl;
-
+	MidiMixer mm;
+	
+	
 	public FaceMark fm;
     VideoCaptureTool vidC;
 
@@ -67,14 +70,19 @@ public class eatMoneyMain extends PApplet {
 	PVector camPos;
 	PVector camPosnew;
 	float cameraspeed = 0.02f;
+	int speedchange = 0;
 	float fov = 60; 
 	
+	boolean noiseMove = false;
+	float noiseScale = 0.02f;
+	
 	ButlerObject bo;
-	ClothObject co;
+	public ClothObject co;
 	VideoObject vo;
-	LightRig lightRig;
+	public LightRig lightRig;
 	displaceTexture dt;
 	
+	public float generalState = 0.f;
 	  
 	public status runStatus = status.PRE;
 	public mode showMode = mode.cloth;
@@ -85,6 +93,7 @@ public class eatMoneyMain extends PApplet {
     PVector cameraNewPos = new PVector(0,0,0);
     PVector middleSlidePos = new PVector(0,0,0);	
 	
+    
 	
 	public static void main(String[] args) {
 		PApplet.main("eatmoney.eatMoneyMain");
@@ -99,12 +108,15 @@ public class eatMoneyMain extends PApplet {
 	public void setup() {
 		frameRate(30);
 
+		myRemoteLocation = new NetAddress("192.168.1.124",9000);
+		
 		cont = new eatMoneyController(this,this);	
 		oscP5 = new OscP5(this,7000);	
+		
 		bo = new ButlerObject(this);
 		vo = new VideoObject(this);
 		GP = new Gamepad(this);
-
+		mm = new MidiMixer(this);
 	}
 	
 	public void setupCalibration(String filename, boolean newCalibration) {
@@ -131,7 +143,7 @@ public class eatMoneyMain extends PApplet {
 		co = new ClothObject(mc,this,this);
 		mc.smooth(8);
 		
-		lightRig = new LightRig(mc,this);
+		lightRig = new LightRig(mc,this,this);
 		dt = new displaceTexture(this,1920*Planes,height);
 		
 		glow = loadShader("shader\\glow.glsl"); 
@@ -151,6 +163,7 @@ public class eatMoneyMain extends PApplet {
 		camPosnew = new PVector(width/2.0f, height/2.0f, (height/2.0f) / tan(PI*30.0f / 180.0f));
 	}
 	
+
 	
 	public void draw() {
 		 
@@ -175,12 +188,29 @@ public class eatMoneyMain extends PApplet {
 		}
 		else if(runStatus == status.RUN || runStatus == status.CAMPRE) {
 			
-		  	if(Math.random() > 0.99) cameraspeed = random(0.1f) + 0.02f;
-			  
+			if(Math.random() > 0.99) noiseScale = random(0.5f);
+			
+		  	if(Math.random() > 0.99 && speedchange == 0) cameraspeed = random(0.05f) + 0.02f;
+		  	else if(Math.random() > 0.99 && speedchange == 0) {
+		  		speedchange = floor(random(500));
+		  	}
+		  	speedchange:
+		  	if(speedchange != 0) {
+		  		if(cameraspeed >= 0.043) cameraspeed-=0.005;
+		  		else if (cameraspeed < 0.037) cameraspeed += 0.005;
+		  		else { 
+		  			speedchange=0;
+		  			break speedchange;
+		  		}
+		  		speedchange--;
+		  	}
+		  	
+		  	
 		  	co.calcCloth();
 
 		  	PVector middle = new PVector();
-		  	
+		  	 PVector offset = new PVector(0,0,0);
+		  	 
 		  	if(showMode == mode.empty) {
 		  		middle.x = 0;
 		  		middle.y = 0;
@@ -194,9 +224,12 @@ public class eatMoneyMain extends PApplet {
 		  		if(co.cc == clothCenter.cloth) {
 			  		cameraspeed = 0.02f;
 			  		middle = co.getClothMiddle();
-			  		cameraNewPos.x = 0;
-					cameraNewPos.y = 0;
-					cameraNewPos.z = -400;
+			  		if(random((float) 1.) > 0.99f) {
+			  		
+			  		cameraNewPos.x = random(2000)-1000.f;
+					cameraNewPos.y = random(200)-100.f;
+					cameraNewPos.z = random(400) + 100.f * -1.f;
+			  		}
 		  		}
 		  		else if(co.cc == clothCenter.pin) {
 			  		cameraspeed = 0.02f;
@@ -246,6 +279,7 @@ public class eatMoneyMain extends PApplet {
 		  	}
 		  	
 		  	else if(showMode == mode.butler) {
+		  		offset = bo.camoffset;
 		  		middle = bo.butlerMean;
 		  		middle.add(bo.ButlerOffset);
 		  		if(random(1.f)>0.95f) {
@@ -261,20 +295,38 @@ public class eatMoneyMain extends PApplet {
 				cameraNewPos.z = middle.z+bo.camoffset.z;
 		  	}
 			
+		  	////////////////////////////////////NOISE
+		  	float noiseVal = 0.f, noiseVal2 = 0.f, noiseVal3 = 0.f;
+		  	float noiseVal4 = 0.f, noiseVal5 = 0.f, noiseVal6 = 0.f;
+		  	
+		  	if(noiseMove == true) {
+		  		noiseVal = noise((frameCount*0.02f)*noiseScale)*150;
+		  		noiseVal2 = noise((frameCount*0.04f)*noiseScale)*150;
+		  		noiseVal3 = noise((frameCount*0.03f)*noiseScale)*150;
+		  		if(showMode != mode.butler) {
+		  		noiseVal4 = sin(frameCount * noiseScale*0.056f) * noiseVal*20.f;
+		  		noiseVal5 = 1.f-sin(frameCount * noiseScale*0.05f) * noiseVal2*20.f;
+		  		noiseVal6 = cos(frameCount * noiseScale*0.04f) * noiseVal3*20.f;
+		  		}
+		  	}
+		  	
+		  	
 			 mc.beginDraw();
 			 mc.pushMatrix();
 			 mc.clear();
 			 mc.background(0);
 			 
-		 	 cameraSlidePos.x = lerp(cameraSlidePos.x,cameraNewPos.x,(float) cameraspeed);
-		     cameraSlidePos.y = lerp(cameraSlidePos.y,cameraNewPos.y,(float) cameraspeed);
-		     cameraSlidePos.z = lerp(cameraSlidePos.z,cameraNewPos.z,(float) cameraspeed);
+		 	 cameraSlidePos.x = lerp(cameraSlidePos.x,cameraNewPos.x+noiseVal4,(float) cameraspeed);
+		     cameraSlidePos.y = lerp(cameraSlidePos.y,cameraNewPos.y+noiseVal5,(float) cameraspeed);
+		     cameraSlidePos.z = lerp(cameraSlidePos.z,cameraNewPos.z+noiseVal6,(float) cameraspeed);
 		    
-		     middleSlidePos.x = lerp(middleSlidePos.x,middle.x,(float) cameraspeed);
-		     middleSlidePos.y = lerp(middleSlidePos.y,middle.y,(float) cameraspeed);
-		     middleSlidePos.z = lerp(middleSlidePos.z,middle.z,(float) cameraspeed);
+		     middleSlidePos.x = lerp(middleSlidePos.x,middle.x+noiseVal,(float) cameraspeed);
+		     middleSlidePos.y = lerp(middleSlidePos.y,middle.y+noiseVal2,(float) cameraspeed);
+		     middleSlidePos.z = lerp(middleSlidePos.z,middle.z+noiseVal3,(float) cameraspeed);
 
-		     lightRig.doLight();
+		    
+		     
+		     lightRig.doLight(offset);
 		    
 		     mc.camera(cameraSlidePos.x, cameraSlidePos.y,cameraSlidePos.z,middleSlidePos.x,middleSlidePos.y,middleSlidePos.z, 0, 1, 0);
 		     mc.perspective(PI/2.0f, (float)mc.width/(float)mc.height, 0.1f, 50000.f);
@@ -312,7 +364,6 @@ public class eatMoneyMain extends PApplet {
 		    		 bo.easing -= 0.01f;
 		    		 if(bo.easing <= 0.f) {
 		    			 bo.displaymode = ObjectMode.off;
-		    			 showMode = mode.cloth;
 		    			 break butlerloop;
 		    		 }
 		    	 }
@@ -328,7 +379,7 @@ public class eatMoneyMain extends PApplet {
 	    				PVector currentCamPos = middleSlidePos;
 	    				float d = middle.dist(currentCamPos);
 						if(d < 200. && vo.vb.lifetime < 1. && vo.vb.impact == false ) {
-							vo.vb.lifetime += 0.01;
+							vo.vb.lifetime += 0.03;
 							if(vo.vb.lifetime >= 1.) {
 								vo.vb.impact = true;
 							}
@@ -348,7 +399,6 @@ public class eatMoneyMain extends PApplet {
 			    		 //turn off if eased out
 			    		 if(vo.easing <= 0.f) {
 			    			 vo.displaymode = ObjectMode.off;
-			    			 showMode = mode.cloth;
 			    			 break videoloop;
 			    		 }
 		    		 }
@@ -384,31 +434,56 @@ public class eatMoneyMain extends PApplet {
 			layer.shader(glow);
 		    layer.image(mc,0,0);
 		    layer.resetShader();
-			dt.drawDTexture();
-			dt.drawShader(layer); 
+		    if(dt.display == true) {
+		    	layer.endDraw();
+		    	dt.drawDTexture();
+		    	layer.beginDraw();
+		    	dt.drawShader(layer); 
+		    	dt.lifetime += 0.02;
+		    	if(dt.lifetime >= 2.) {
+		    		dt.display = false;
+		    		dt.lifetime = 0.f;
+		    		
+		    	}
+		    }
 		    layer.endDraw();
 
-			//glow.set("iGlobalTime", frameRate * 0.2f); 
-			//shader(glow);
 			  if(cal.planeObjects != null && cal.planeObjects.size() > 0) {
 				  for(PShape p : cal.planeObjects) {
 					  shape(p);
 				  }
 			  }
 
+			image(layer,3840,0,1920,1080);
+			 /* 
+			else if(showMode == showMode.cam) {
+				image(vidC.getCameraImage(),1920+1920*Planes,0);
 				
-			//resetShader();
+			}
+			else if(showMode == showMode.comment) {
+				int cwidth = co.userC.cWidth;
+				PGraphics comment = createGraphics(1920,1080,P2D);
+				comment.beginDraw();
+				image(co.drawComments(comment),(comment.width/2.f - ((float)cwidth/2.f) ),0);
+				comment.endDraw();
+				image(comment,1920+1920*Planes,0);
+			}
+			  
+			  */
 			
 		    ///////////////////////////////////////////////////
 		    ///////////// CONTROL CONTENT
 		    ///////////////////////////////////////////////////
 			
-			textSize(10);
+			textSize(14);
 			  
 		    image(layer,0,0,960*Planes,540);
 		    image(vidC.getCameraImage(),1920-640,540,640,360);
 		  
-		    text("LM: " + fm.landmarks.size(),1920-640,540+370);
+		    text("detection: " + fm.detection,1920-640,540+370);
+		    text("LM: " + fm.landmarks.size(),1920-640,540+390);
+		    
+		    text("GeneralState: " + generalState,1920-640,540+410);
 
 		    
 		    //show save button
@@ -441,16 +516,25 @@ public class eatMoneyMain extends PApplet {
 	void oscEvent(OscMessage theOscMessage) {
 		if(runStatus == status.RUN) {
 		  if(theOscMessage.addrPattern().equals("/butler")) {
+			  if(showMode != mode.butler) startButler();
 			  int take = theOscMessage.get(0).intValue(); 
 			  bo.butlerData.openTake(take);
 		  }
+		  /*
 		  if(theOscMessage.addrPattern().equals("/band")) {
 			  for(int i = 0; i < 8; i++) {
 				  bo.butlerData.deformMatrix[i] = theOscMessage.get(i).floatValue();
 			  }
 		  
 		  }
+		  */
 		 }
+	}
+	
+	void sendOsc(int note) {
+		  OscMessage myMessage = new OscMessage("/trigger");  
+		  myMessage.add(note); 
+		  oscP5.send(myMessage, myRemoteLocation); 
 	}
 	
 	
@@ -501,11 +585,11 @@ public class eatMoneyMain extends PApplet {
 		 co.cc = clothCenter.comment;
   		 co.newComment(comment);
 		 showMode = mode.comment;
-		 cameraspeed = 0.3f;
+		 cameraspeed = 0.03f;
 
 	}
 	
-	public void showVideo() {
+	public void showVideo(int vidmode,int shader) {
 		if(showMode == mode.comment) {
 			co.stopComment();
 		}
@@ -518,7 +602,7 @@ public class eatMoneyMain extends PApplet {
 		if(vo.vb == null ||  vo.vb.impact == false ) {
 			 showMode = mode.cam;
 			 vo.displaymode = ObjectMode.in;
-			 vo.newVideoBlob(1,co.nodecount*co.nodecount);
+			 vo.newVideoBlob(1,co.nodecount*co.nodecount,vidmode,shader);
 		  }
 	}
 	
@@ -537,6 +621,7 @@ public class eatMoneyMain extends PApplet {
 		}
   		  	
 		showMode = mode.cloth;
+		co.DISPLAY_MESH = true;
   		co.cc = clothCenter.cloth;
   		co.displaymode = ObjectMode.in;
   		if(bo.displaymode != ObjectMode.off && bo.displaymode != ObjectMode.out) bo.displaymode = ObjectMode.out;
@@ -564,16 +649,20 @@ public class eatMoneyMain extends PApplet {
 		  case '1' : showCloth();
 		  		     return;
 		  		     
-		  case '2' : showVideo();
+		  case '2' : showVideo(0,1);
 		  			 return;
-		  		     
-		  case '3' : startComments(1);
+
+		  case '3' : showVideo(0,2);
 		  			 return;
-		  			 	 
-		  case '4' : startButler();
+		  			 
+		  case '4' : showVideo(1,1);
+		  			 return;
+		  case '5' : showVideo(1,2);
+			 		return;		  			 	 
+		  case '6' : startButler();
 		  			 return;	
 		  			 
-		  case 'b' : if(bo.displaymode == ObjectMode.run) {
+		  case '7' : if(bo.displaymode == ObjectMode.run) {
 				  		 bo.butlerData.openTake(bo.nextvid);
 				  		 bo.nextvid++;
 				 		 if(bo.nextvid>=73) bo.nextvid = 20;
@@ -588,11 +677,34 @@ public class eatMoneyMain extends PApplet {
 		  case 'e' : co.reshake();
 					 return;
 		  case 'r' : co.mark();
-			 	     return;	
-	 	     
+			 	     return;
+		  case 't' : co.textureAlpha = (co.textureAlpha == 0.f) ? 1.f : 0.f;
+		  			 return;
+		  case 'z' : showInsert(1);
+			 		 return;		  			 
+		  
+		  case 'a' : mm.switchCh(0, 0);
+		  			 return;
+		  case 's' : mm.switchCh(1, 0);
+			 		 return;		 
+		  case 'd' : mm.switchCh(2, 0);
+		  			 return;
+		  case 'f' : mm.switchCh(3, 0);
+		  		     return;		  			 
+
+		  case 'g' : mm.switchPreset(0);
+		  			 return;
+		  case 'h' : mm.switchPreset(1);
+		     	     return;
 		  }  
 	  }
 	
+	private void showInsert(int i) {
+		dt.contentID = (random(1.f) > 0.5f) ? 1 : 0;
+		dt.display = true;
+		dt.setupTex();
+	}
+
 	public void mousePressed(){
 		if(runStatus == status.RUN) {
 			if (mouseButton == LEFT && showMode == mode.cloth) {

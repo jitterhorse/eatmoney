@@ -96,7 +96,7 @@ public class ButlerObject {
 				 rawData = butlerData.readFrame();	 
 				 mc.pushMatrix();
 				 mc.translate(ButlerOffset.x, ButlerOffset.y,ButlerOffset.z);
-				 mc.lightSpecular(24, 24, 24);
+				 mc.lightSpecular(124, 124, 124);
 				 mc.specular(12, 12, 0);
 				 mc.shininess(0);
 	
@@ -197,7 +197,7 @@ public class ButlerObject {
 			 }
 
 			  butlerMean.x = parent.lerp(butlerMin.x,butlerMax.x, 0.5f);
-			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.25f);
+			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.15f);
 			  butlerMean.z = parent.lerp(butlerMin.z,butlerMax.z, 0.5f);
 		}
 		

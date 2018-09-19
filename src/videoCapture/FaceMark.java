@@ -236,6 +236,13 @@ public class FaceMark implements Runnable{
 					detect();
 				}
 				else if(detection == false) {
+					 if(landmarks.size() != 0) landmarks = new Point2fVectorVector();
+					 if(faceVector.size() != 0) faceVector = new RectVector();
+					 if(eyeVector.size() != 0) eyeVector = new RectVector();
+					 if(bodyVector.size() != 0) bodyVector = new RectVector();
+					 if(handVector.size() != 0) handVector = new RectVector();
+					
+					
 				}
 			}
 			

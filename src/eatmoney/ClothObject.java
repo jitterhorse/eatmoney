@@ -14,6 +14,7 @@ import com.thomasdiewald.pixelflow.java.utils.DwCoordinateTransform;
 import com.thomasdiewald.pixelflow.java.utils.DwStrokeStyle;
 
 import eatmoney.ClothObject.clothCenter;
+import eatmoney.textBadges.textB;
 import enums.Follow;
 import enums.ObjectMode;
 import enums.mode;
@@ -35,7 +36,7 @@ public class ClothObject {
 	  DwPixelFlow context;
 	  
 	  DwPhysics.Param param_physics = new DwPhysics.Param();
-	  DwParticle.Param param_cloth_particle = new DwParticle.Param();
+	  public DwParticle.Param param_cloth_particle = new DwParticle.Param();
 	  
 	  DwSpringConstraint.Param param_cloth_spring = new DwSpringConstraint.Param();
 	  DwPhysics<DwParticle3D> physics = new DwPhysics<DwParticle3D>(param_physics);
@@ -47,7 +48,7 @@ public class ClothObject {
 	  
 	  // entities to display
 	  boolean DISPLAY_MESH           = true;
-	  boolean DISPLAY_GRID 		     = true;
+	  boolean DISPLAY_GRID 		     = false;
 	  
 	  boolean UPDATE_PHYSICS         = true;
 	  
@@ -59,10 +60,10 @@ public class ClothObject {
 	  PApplet parent;
 	  eatMoneyMain parentc;
 	  PGraphics  texture;
-	  PShader tex,data;
+	  PShader tex,tex2,data;
 	  PShader dataLines;
 
-	  PShape object;
+	  PShape object,crosses;
 	  PShape shp_aabb;
 	  int packets = 400;
 	  float sizeObjects = 10.f;
@@ -71,6 +72,7 @@ public class ClothObject {
 	  PVector camCenter = new PVector(0,0,0);
 	  
 	  float easing = 1.f;
+	  public float textureAlpha = 0.f;
 	  
 	  public enum clothCenter{
 		  cloth,pin,emit,comment;
@@ -101,6 +103,8 @@ public class ClothObject {
 	  boolean createBadges = false;
 	  int badgeCount = 0;
 	  
+	  boolean cross = true;
+	  
 	  textBadges TB;
 	  
 	  ArrayList<DataPacket> currentHandles = new ArrayList<DataPacket>();
@@ -108,7 +112,7 @@ public class ClothObject {
 	  ArrayList<textBadge> currentBadges = new ArrayList<textBadge>();
 	  
 	  DwParticle3D[] particles;
-	  int nodedistance = 30; //distance between nodes
+	  int nodedistance = 80; //distance between nodes
 	  int nodecount = 30; // per axis = 30*30 = 900
 	  
 	  float[][] norms;
@@ -117,11 +121,12 @@ public class ClothObject {
 	  
 	  ArrayList<CommentBlob> currentComments = new ArrayList<CommentBlob>();
 	  
+	  float[] clothMoverSpeeds = {0.01f,0.03f};
 	  
 	  
 	  class CommentBlob{
 		  
-		  float lifetime = 1.f;
+		  float lifetime = 0.5f;
 		  float impact = 0.f;
 		  boolean active = true; //is active
 		  boolean comments = false; //triggered comment?
@@ -130,15 +135,21 @@ public class ClothObject {
 		  PVector size = new PVector(0,0,0);
 		  PGraphics target = targetGraph;
 		  PVector speeds = new PVector(0,0,0);
+		  int col = 0;
+		  int detail = 4;
 		  
 		  public CommentBlob(PVector _origin) {
 			  center = _origin;
-			  size.x = parent.random(500)+20;
-			  size.y = parent.random(500)+20;
-			  size.z = parent.random(500)+20;
-			  speeds.x = parent.random(0.3f);
-			  speeds.y = parent.random(0.3f);
-			  speeds.z = parent.random(0.3f);
+			  size.x = parent.random(800)+20;
+			  size.y = parent.random(800)+20;
+			  size.z = parent.random(800)+20;
+			  speeds.x = parent.random(0.2f);
+			  speeds.y = parent.random(0.2f);
+			  speeds.z = parent.random(0.2f);
+			  lifetime += Math.random();
+			  col = parentc.color((float)(Math.random()*100.+155.),(float)(Math.random()*20+30),0.f,(float)(Math.random()*100.+155));
+			  detail += Math.floor(Math.random()*10);
+			  
 		  }
 		  
 		  public void move() {
@@ -166,55 +177,79 @@ public class ClothObject {
 		  
 		  userC = new comments(parent);
 		  
-		  texture = parent.createGraphics(1000,1000,PConstants.P2D);
+		  texture = parent.createGraphics(2000,2000,PConstants.P2D);
 		  tex = parent.loadShader("shader\\datatexture.glsl");
+		  tex2 = parent.loadShader("shader\\oil.glsl");
 		  data = parent.loadShader("shader\\packetsF2.glsl","shader\\packetsV2.glsl");
 		  dataLines = parent.loadShader("shader\\dataLinesF.glsl");
 
 		  createObj();
-
+		  createCrosses();
 		  setupPhysics();
 	  }
 	  
 	  public void reState() {
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.2) {
 			  shake();
 		  }
 		  
-		  else if(Math.random() > 0.8) {
+		  else if(Math.random() > 0.8 && parentc.generalState > 0.3) {
 			  reshake();
 		  }
 		  
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.5) {
 			  mark();
 		  }
 		  		  
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.1) {
 			  emit();
 		  }
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.7) {
 			  badges();
 		  }
 		  
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.25) {
 			  DISPLAY_MESH = !DISPLAY_MESH;
 		  }
-		  if(Math.random() > 0.5) {
+		  if(Math.random() > 0.5 && parentc.generalState > 0.35) {
 			  DISPLAY_GRID = !DISPLAY_GRID;
-		  }		  
+		  }	
 		  
+		  if(Math.random() > 0.8 && parentc.generalState > 0.45) {
+			  cc = clothCenter.random();
+		  }
+		  if(Math.random() > 0.9 && parentc.generalState > 0.65) {
+			  textureAlpha = parentc.abs(textureAlpha - 1.f);
+		  }	
+		  if(Math.random() > 0.2 && parentc.generalState > 0.45) {
+			  clothMoverSpeeds[0] = (float) (Math.random()*0.03f);
+			  clothMoverSpeeds[1] = (float) (Math.random()*0.05f);
+		  }
+		  parentc.sendOsc(PApplet.floor((float)Math.random()*5.f));
 	  }
+	  
+	  
+	  public void resetCloth() {
+		  currentBadges = new ArrayList<textBadge>();
+		  currentHandles = new ArrayList<DataPacket>();
+		  currentExposes = new ArrayList<GridExpose>();
+		  TB.currentBadges = new ArrayList<textB>();
+		  DISPLAY_MESH           = true;
+		  DISPLAY_GRID 		     = false;
+		  textureAlpha = 0.f;
+	  }
+	  
 	  
 	  public void calcCloth() {
 		  
-		  if(parentc.showMode == mode.cloth && Math.random() > 0.99) {
+		  if(parentc.showMode == mode.cloth && Math.random() > 0.995) {
 			  reState();
 		  }
 		  
 		   createTexture(); //texture for CLOTH
 
-		   float[] new1 = {100,parent.sin(parent.frameCount*0.01f)*500,1000,1};
-		   float[] new2 = {1500,parent.sin(parent.frameCount*0.01f)*500,1000,1};
+		   float[] new1 = {100,parent.sin(parent.frameCount*clothMoverSpeeds[0])*500,1000,1};
+		   float[] new2 = {1500,parent.sin(parent.frameCount*clothMoverSpeeds[1])*500,1000,1};
 
 		   particles = physics.getParticles();	
 		   particles[0].moveTo(new1, 0.8f);
@@ -245,7 +280,8 @@ public class ClothObject {
 			   if(shake == true) {
 				   currentHandles = new ArrayList<DataPacket>();
 				   float newphys = (float) (Math.random()*0.1f - 0.05f) ;
-				   param_physics.GRAVITY = new float[]{ 0,0,newphys};
+				   float newphys1 = (float) (Math.random()*0.02f - 0.01f) ;
+				   param_physics.GRAVITY = new float[]{ 0,newphys1,newphys};
 				   for(int i = 0; i < shakeCount; i++) {
 					   int te = particles.length;
 					   int t = parent.floor((float) (Math.random()*te));
@@ -377,7 +413,7 @@ public class ClothObject {
 	
 	  public void drawCloth(PGraphics target) {
 		  
-		  DISPLAY_MESH = true;
+		  //DISPLAY_MESH = true;
 		  if(cc == clothCenter.comment) {
 			DISPLAY_MESH = false;
 		  }
@@ -402,7 +438,7 @@ public class ClothObject {
 				    styleS.stroke_color = parent.color(255,255,255,20);
 				    body.createShapeWireframe(target, styleS);
 				    body.computeNormals();
-				    
+				    target.shader(dataLines,PConstants.LINES);
 				    target.translate(0,0,-400);
 			        body.displayWireframe(target);
 			        target.translate(0,0,800);
@@ -431,6 +467,7 @@ public class ClothObject {
 		    		target.translate(0, 0, (1200.0f*g.grid) * (1.f-g.lifetime));
 		    		target.rectMode(PConstants.CENTER);
 		    		target.noFill();
+		    		target.shader(dataLines,PConstants.LINES);
 		    		target.stroke(255,255 * (g.lifetime));
 		    		target.rect(0, 0, g.size, g.size);
 		    		if(g.count > 1) {
@@ -467,6 +504,7 @@ public class ClothObject {
 		    	    float z0 = (float) (position.z + (pos.z*200));
 		    	    target.stroke(255);
 		    	    target.strokeWeight(1);
+		    	    target.shader(dataLines,PConstants.LINES);
 		    	    target.line(x0,y0,z0,x,y,z);
 		    }
 		    
@@ -487,11 +525,11 @@ public class ClothObject {
 			  target.noFill();
 			  target.stroke(255);
 			  target.strokeWeight(1);
-			  target.sphereDetail(10);
+			  target.sphereDetail(c.detail);
 			  target.sphere(3 + (5000 * c.impact));
 			  target.noLights();
 			  target.strokeWeight(40 + 5000 * c.impact);
-			  target.stroke(255,90,80,122);
+			  target.stroke(c.col);
 			  target.point(0, 0);
 			  target.popMatrix();
 			  if(c.lifetime < 0 && c.comments == false) {
@@ -501,7 +539,47 @@ public class ClothObject {
 			  if(c.active == false) currentComments.remove(c);  
 		  	}   
 		  
-		 
+		  
+		  if(cross == true) {
+				 for(int i = 0; i < nodecount*nodecount; i++) {
+					 		PVector pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    PVector v1  = new PVector(-10,0,0);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6),pos);
+						    
+					 		pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    v1  = new PVector(10,0,0);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6)+1,pos);	
+
+					 		pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    v1  = new PVector(0,-10,0);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6)+2,pos);	
+
+					 		pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    v1  = new PVector(0,10,0);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6)+3,pos);
+
+					 		pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    v1  = new PVector(0,0,-10);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6)+4,pos);
+						    
+					 		pos = new PVector(particles[i].cx,particles[i].cy,particles[i].cz);
+						    v1  = new PVector(0,0,10);
+						    pos.add(v1); 
+						    crosses.setVertex((i*6)+5,pos);
+						    
+					       
+				 
+				 }
+				 target.pushMatrix();
+				 target.shader(dataLines,PConstants.LINES);
+				 target.shape(crosses);
+				 target.popMatrix();
+		  }
 
 	  }
 	  
@@ -520,13 +598,18 @@ public class ClothObject {
 	  public void createTexture() {
 		  texture.beginDraw();
 		  texture.clear();
+		  /*
 		  tex.set("iTime",parent.frameCount*0.01f);
 		  tex.set("thresh", easing);
+		  tex.set("alpha", textureAlpha);
 		  texture.shader(tex);
+		  */
+		  tex2.set("iTime",parent.frameCount*0.01f);
+		  tex2.set("thresh", easing);
+		  tex2.set("alpha", textureAlpha);
+		  texture.shader(tex2);		  
 		  texture.rect(0,0,parent.width,parent.height);
 		  texture.resetShader();
-		  //texture.fill(120,255);
-		  //texture.rect(0, 0, parent.width, parent.height);
 		  texture.endDraw();			  
 	  }
 	  
@@ -544,7 +627,7 @@ public class ClothObject {
 		    
 		    // physics world parameters
 		    param_physics.GRAVITY = new float[]{ 0,0,-0.1f};
-		    param_physics.bounds  = new float[]{ -2200, -2200, -1200, +2200, +2200, +1200 };
+		    param_physics.bounds  = new float[]{ -4200, -4200, -2200, +4200, +4200, +2200 };
 		    param_physics.iterations_collisions = 2;
 		    param_physics.iterations_springs    = 8;
 		    
@@ -652,7 +735,20 @@ public class ClothObject {
 		     object.endShape();
 		 }
 	  
-
+	  void createCrosses() {
+		  	crosses = parent.createShape();
+		  	for(int i = 0; i < nodecount*nodecount; i++) {
+			  	crosses.beginShape(PConstants.LINES);
+		        crosses.stroke(255);
+		        crosses.vertex(-10,0,0);
+		        crosses.vertex(10,0,0);
+		        crosses.vertex(0,-10,0);
+		        crosses.vertex(0,10,0);
+		        crosses.vertex(0,0,-10);
+		        crosses.vertex(0,0,10);
+		        crosses.endShape();
+		  	}
+	  }
 
 	  
 	  // sticks with particles sitting on cloth
@@ -778,7 +874,7 @@ public class ClothObject {
 	
 	public void shake() {
 		shake = true;
-		shakeCount = parent.floor(parent.random(10));
+		shakeCount = parent.floor(parent.random(30));
 	}
 
 	public void reshake() {
@@ -790,7 +886,7 @@ public class ClothObject {
 	
 	public void mark() {
 		mark = true;
-		markCount = parent.floor(parent.random(10));
+		markCount = parent.floor(parent.random(30));
 	}
 	
 	public void emit() {
