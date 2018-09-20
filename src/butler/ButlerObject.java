@@ -7,10 +7,12 @@ import processing.core.PVector;
 import processing.data.JSONArray;
 import processing.data.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import butler.readData.State;
 import eatmoney.eatMoneyMain;
+import eatmoney.textBadges;
 import enums.ObjectMode;
 
 public class ButlerObject {
@@ -49,7 +51,7 @@ public class ButlerObject {
 		
 		public float easing = 0.f;
 		public ObjectMode displaymode = ObjectMode.off;
-		
+		  
 		public class Offset{		
 			int file;
 			int offset;
@@ -92,6 +94,7 @@ public class ButlerObject {
 
 		
 		public void drawButler(PGraphics mc) { 
+			
 			if(butlerData.state == State.mix1 || butlerData.state == State.mix2 || butlerData.state == State.inmix){ 
 				 rawData = butlerData.readFrame();	 
 				 mc.pushMatrix();
@@ -200,6 +203,7 @@ public class ButlerObject {
 			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.15f);
 			  butlerMean.z = parent.lerp(butlerMin.z,butlerMax.z, 0.5f);
 		}
+		
 		
 		PVector depthToWorld(float x, float y, float depth) {
 

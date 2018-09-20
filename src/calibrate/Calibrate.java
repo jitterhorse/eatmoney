@@ -40,7 +40,7 @@ public class Calibrate {
 	  int stepsx = 16;
 	  int stepsy = 9;
 	
-	  int border = 50;
+	  int border = 150;
 
 	  public float currenthandle = 0.f;
 	  String filename;

@@ -28,13 +28,12 @@ public class displaceTexture {
 		disp = parent.createGraphics(width,height,PConstants.P2D);
 		f = _parent.createFont("Beauty Normal-Italic", 250);
 		displace = parent.loadShader("shader\\displaceF.glsl");
-		disp = parent.createGraphics(width,height,PConstants.P2D);
-	    
+		disp = parent.createGraphics(width,height,PConstants.P2D);	    
 	}
 	
 	public void setupTex() {
-		offX = 1.f/(float)pwidth * parent.floor((float) (parent.random(80.f) - 40.));
-		offY = 1.f/(float)pheight * parent.floor((float) (parent.random(80.f) - 40.));
+		offX = 1.f/(float)pwidth * parent.floor((float) (parent.random(8.f) - 4.));
+		offY = 1.f/(float)pheight * parent.floor((float) (parent.random(8.f) - 4.));
 	}
 	
 	
@@ -48,7 +47,7 @@ public class displaceTexture {
 		  float lt = lifetime;
 		  if(lifetime > 1.) lt = 1.f - (lifetime-1.f);
 		  float alp = easeInOut(lifetime,0.f,255.f,2.f);
-		  disp.fill(255,alp);
+		  disp.fill(255,alp+0.00001f);
 		  float pos = easeInOut(lifetime,-50.f,100.f,2.f);
 		  disp.text(contents[contentID], (float)disp.width/2.f, (float)disp.height/2.f + pos);
 		  disp.endDraw();

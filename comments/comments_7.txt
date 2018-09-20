@@ -1,17 +1,8 @@
-0-Wetter? 
-1-Sie meint Klima
-1-Na und?
-2-Sie meint: nicht das System ist schuld und auch nicht die Flüchtlinge, sondern die Dürre…
-1-Gut, wenn es immer noch jemanden gibt, dem man die Verantwortung in die Schuhe schieben kann
-2-Recht hat sie trotzdem… 
-1-An die 54%: Glaubt ihr im Ernst, die Tusse hat noch was Interessantes zu sagen?
-1-Warum eigentlich die Tarp-Stiftung, warum nicht der Staat? 
-1-Weil der Staat pleite ist
-1-Jetzt sind wir alle pleite 
-0-Was meint die, mit finaler Lösung? 
-0-Kurz und Schmerzlos
-0-Chip abschalten wäre qualvoller 
-0-Ihr seid alle nicht besser als die
-0-Aber hungriger 
-0-Warum soll ich denen was geben, wenn ich selbst nix hab? 
-0-Für die Show… 
+0-Ich war dabei, damals. Der große Aufbruch. Ich glaub ich hab mich nie wieder so gut gefühlt, wie an dem Abend. Ich dachte echt, wir hätten es geschafft. 
+1-Hör doch auf mit dem Gejammer. Du bist auf die reingefallen, wie alle anderen auch. Gib dir endlich die Kugel
+2-Geb der Roloeg die Kugel! Und dem Rosser gleich mit
+2-Fentanyl wär mir lieber. 
+3-Zu schmerzlos
+3-Fentanyl? Ist das das Zeug, was sie den Alten gegeben haben, die sich umbringen wollten? 
+0-Genau, erst haben sie es „die chinesische Epidemie“ genannt, dann haben sie es verteilt wie Bonbons. 
+0-Wenn ich Fentanyl auftreiben kann, dann wars das. Dann mach ich Schluss… 

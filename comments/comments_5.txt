@@ -1,11 +1,11 @@
-0-Gewerkschaften für Cyborgs
-0-Hör endlich mit dem Scheiss auf. Wir brauchen keine Gewerkschaften. Wir sind vernetzt. 
-0-Wir zappeln im Netz und ihr merkt es nicht mal. 
-0-Ohne das Netz wären wir schon alle ertrunken. 
-0-Die meisten sind ertrunken. Und die, die Überleben, zappeln. Was soll das für ein Leben sein?
-0-Wo Leben ist, ist Hoffnung. 
-0-Bist du das, Poet? Wie geht’s dir? 
-0-Ging schon besser, aber ich will nicht klagen. Seit Monaten kein Update. Das Zittern ist zurück. Aber geht ja vielen so. 
-0-Tut mir leid, dass zu hören, Poet.  Aber du hast Recht, wo Leben ist, ist Hoffnung. Halt durch! Vielleicht können die uns ja helfen, wenn sie mit ihrem Prozess durch sind.
-0-Wenn die uns überhaupt helfen wollen. 
-0-Klar wolln die das. Wenn die das können, werden die das auch tun.
+0-Ist das eigentlich gescripted oder sind die echt?
+0-Vorabend
+0-Keine Ahnung, was das heißen soll. Aber die sind echt. Yldune und Onz sind Aktivisten aus den 10er und 20er Jahren, die sich radikalisiert haben, als der Nano-Tremor aufkam und die Stiftung das Grundeinkommen eingeführt hat.
+1-Danke, Herr Lehrer
+2-Warum Herr? 
+0-Will hier mal jemand zur Sache reden? Wir sollen am Ende entscheiden, ob die Leben oder Sterben. Das muss man ernst nehmen?
+1-Im Ernst? Ich soll das ernst nehmen? 
+0-Ihr meint, das ist echt? Die schießen am Ende wirklich jemanden tot? 
+1-Nicht jemanden, sondern die Angeklagten… 
+0-Trotzdem, ich finde das irgendwie nicht richtig
+1-Heul doch 

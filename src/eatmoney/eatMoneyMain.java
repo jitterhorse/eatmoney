@@ -17,6 +17,7 @@ import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
@@ -76,9 +77,9 @@ public class eatMoneyMain extends PApplet {
 	boolean noiseMove = false;
 	float noiseScale = 0.02f;
 	
-	ButlerObject bo;
+	public ButlerObject bo;
 	public ClothObject co;
-	VideoObject vo;
+	public VideoObject vo;
 	public LightRig lightRig;
 	displaceTexture dt;
 	
@@ -87,12 +88,13 @@ public class eatMoneyMain extends PApplet {
 	public status runStatus = status.PRE;
 	public mode showMode = mode.cloth;
 
-	PShader glow;
+	PShader glow,side;
 	
     PVector cameraSlidePos = new PVector(0,0,0);
     PVector cameraNewPos = new PVector(0,0,0);
     PVector middleSlidePos = new PVector(0,0,0);	
 	
+    PFont f;
     
 	
 	public static void main(String[] args) {
@@ -101,14 +103,16 @@ public class eatMoneyMain extends PApplet {
 
 	public void settings() {
 		fullScreen(P3D,SPAN);  
+		//smooth(16);
 		//size(3840,1080,P3D);
 		ppath = sketchPath();
 	}
 	
 	public void setup() {
 		frameRate(30);
-
-		myRemoteLocation = new NetAddress("192.168.1.124",9000);
+		f = createFont("DejaVu Sans Mono", 24);
+		textFont(f);
+		myRemoteLocation = new NetAddress("192.168.1.13",8521);
 		
 		cont = new eatMoneyController(this,this);	
 		oscP5 = new OscP5(this,7000);	
@@ -141,12 +145,13 @@ public class eatMoneyMain extends PApplet {
 		layer = createGraphics(1920*Planes,height,P2D);
 		
 		co = new ClothObject(mc,this,this);
-		mc.smooth(8);
+		mc.smooth(16);
 		
 		lightRig = new LightRig(mc,this,this);
 		dt = new displaceTexture(this,1920*Planes,height);
 		
 		glow = loadShader("shader\\glow.glsl"); 
+		side = loadShader("shader\\side.glsl");  
 	    glow.set("iResolution", (float)mc.width, (float)mc.height);
 	
 		mc.stroke(0);
@@ -167,7 +172,7 @@ public class eatMoneyMain extends PApplet {
 	
 	public void draw() {
 		 
-		GP.update();
+		
 		
 		clear();
 		background(0);
@@ -187,6 +192,8 @@ public class eatMoneyMain extends PApplet {
 			
 		}
 		else if(runStatus == status.RUN || runStatus == status.CAMPRE) {
+			
+			GP.update();
 			
 			if(Math.random() > 0.99) noiseScale = random(0.5f);
 			
@@ -408,17 +415,35 @@ public class eatMoneyMain extends PApplet {
  
 		     }
 		     
+		     ///////////////////////////////////////COMMENTS	
+		     commentloop:
+		     if(co.userC.displaymode != ObjectMode.off) {
+
+		    	 if(co.userC.easing < 1.f && co.userC.displaymode == ObjectMode.in) co.userC.easing += 0.02f;
+		    	 else if(co.userC.easing >= 1.f && co.userC.displaymode == ObjectMode.in) co.userC.displaymode = ObjectMode.run;
+		    	 else if(co.userC.easing > 0. && co.userC.displaymode == ObjectMode.out) {
+		    		 co.userC.easing -= 0.02f;
+		    		 if(co.userC.easing <= 0.f) {
+		    			 co.userC.displaymode = ObjectMode.off;
+		    			 break commentloop;
+		    		 }
+		    	 }
+		    	 int cwidth = co.userC.cWidth;
+		    	 mc.camera(mc.width/2.0f, mc.height/2.0f, (mc.height/2.0f) / tan(PI*30.0f / 180.0f), mc.width/2.0f, mc.height/2.0f,0, 0, 1, 0);
+		    	 mc.image(co.drawComments(mc),(mc.width/2.f - ((float)cwidth/2.f) ),0);
+		     }	     
 		     
 		     mc.popMatrix();
 		     
 		    
 			//draw comments in middle of screen
+		     /*
 				if(showMode == mode.comment) {
 					int cwidth = co.userC.cWidth;
-					mc.camera(mc.width/2.0f, mc.height/2.0f, (mc.height/2.0f) / tan(PI*30.0f / 180.0f), mc.width/2.0f, mc.height/2.0f,0, 0, 1, 0);
+					//mc.camera(mc.width/2.0f, mc.height/2.0f, (mc.height/2.0f) / tan(PI*30.0f / 180.0f), mc.width/2.0f, mc.height/2.0f,0, 0, 1, 0);
 					mc.image(co.drawComments(mc),(mc.width/2.f - ((float)cwidth/2.f) ),0);
 				}
-		     
+		     */
 		     
 		   
 		     
@@ -430,10 +455,12 @@ public class eatMoneyMain extends PApplet {
 		    
 		    layer.beginDraw();
 		    layer.clear();
-			glow.set("iGlobalTime", frameRate * 0.2f); 
-			layer.shader(glow);
+			//glow.set("iGlobalTime", frameRate * 0.2f); 
+			side.set("iTime", frameRate * 0.2f); 
+			layer.shader(side);
+			//layer.shader(glow);
 		    layer.image(mc,0,0);
-		    layer.resetShader();
+		    //layer.resetShader();
 		    if(dt.display == true) {
 		    	layer.endDraw();
 		    	dt.drawDTexture();
@@ -480,11 +507,14 @@ public class eatMoneyMain extends PApplet {
 		    image(layer,0,0,960*Planes,540);
 		    image(vidC.getCameraImage(),1920-640,540,640,360);
 		  
-		    text("detection: " + fm.detection,1920-640,540+370);
-		    text("LM: " + fm.landmarks.size(),1920-640,540+390);
+		    textSize(20);
+		    textAlign(RIGHT,TOP);
 		    
-		    text("GeneralState: " + generalState,1920-640,540+410);
+		    text("detection: " + fm.detection,1920-650,1080-300);
+		    text("LM: " + fm.landmarks.size(),1920-650,1080-270);
 
+		    String foc = (GP.udp.focusMode == 0) ? "MF" : "AF";
+		    text("focus: " + foc,1920-660,570);
 		    
 		    //show save button
 		    if(runStatus == status.CAMPRE) {
@@ -507,6 +537,8 @@ public class eatMoneyMain extends PApplet {
 		if(co != null && co.currentComments != null) {
 			f = co.currentComments.size();
 		}
+		textSize(15);
+		textAlign(LEFT,TOP);
 	    text("FPS: " + frameRate + " / " + showMode  +" / " + f,50,50);
 	    
 	}
@@ -520,6 +552,15 @@ public class eatMoneyMain extends PApplet {
 			  int take = theOscMessage.get(0).intValue(); 
 			  bo.butlerData.openTake(take);
 		  }
+		  if(theOscMessage.addrPattern().equals("/beep")) {
+			  int note = theOscMessage.get(0).intValue(); 
+			  System.out.println(note);
+			  if(note == 6) {
+			  co.shake();
+			  }  
+		  }
+		  
+		  
 		  /*
 		  if(theOscMessage.addrPattern().equals("/band")) {
 			  for(int i = 0; i < 8; i++) {
@@ -549,6 +590,7 @@ public class eatMoneyMain extends PApplet {
 		}
 		//shutdown comment if running
 		if(showMode == mode.comment) {
+			co.userC.displaymode = ObjectMode.out;
 			co.stopComment();
 			showMode = mode.cloth;
 		}
@@ -586,12 +628,14 @@ public class eatMoneyMain extends PApplet {
   		 co.newComment(comment);
 		 showMode = mode.comment;
 		 cameraspeed = 0.03f;
+		 co.userC.displaymode = ObjectMode.in;
 
 	}
 	
-	public void showVideo(int vidmode,int shader) {
+	public void showVideo(int shader) {
 		if(showMode == mode.comment) {
 			co.stopComment();
+			co.userC.displaymode = ObjectMode.out;
 		}
 		
 		if(showMode == mode.butler) {
@@ -602,7 +646,7 @@ public class eatMoneyMain extends PApplet {
 		if(vo.vb == null ||  vo.vb.impact == false ) {
 			 showMode = mode.cam;
 			 vo.displaymode = ObjectMode.in;
-			 vo.newVideoBlob(1,co.nodecount*co.nodecount,vidmode,shader);
+			 vo.newVideoBlob(1,co.nodecount*co.nodecount,shader);
 		  }
 	}
 	
@@ -618,6 +662,7 @@ public class eatMoneyMain extends PApplet {
 		}
 		if(showMode == mode.comment) {
 			co.stopComment();
+			co.userC.displaymode = ObjectMode.out;
 		}
   		  	
 		showMode = mode.cloth;
@@ -649,16 +694,15 @@ public class eatMoneyMain extends PApplet {
 		  case '1' : showCloth();
 		  		     return;
 		  		     
-		  case '2' : showVideo(0,1);
+		  case '2' : showVideo(0);
 		  			 return;
 
-		  case '3' : showVideo(0,2);
+		  case '3' : showVideo(1);
 		  			 return;
 		  			 
-		  case '4' : showVideo(1,1);
+		  case '4' : showVideo(2);
 		  			 return;
-		  case '5' : showVideo(1,2);
-			 		return;		  			 	 
+	  			 	 
 		  case '6' : startButler();
 		  			 return;	
 		  			 
@@ -742,40 +786,10 @@ public class eatMoneyMain extends PApplet {
 		}
 	}
 	
-
+	
+	
 	
 	
 }
 
-/*
- * public void keyPressed() {
-		
-		if(runStatus == status.RUN) {
-			 switch(key) {
-			     case 'd': fm.setDetection(!fm.detection);
-			     		   return;
-				 case 'e' : butler.butlerData.openTake(butler.testvars[butler.nextvid]);
-					 		butler.nextvid++;
-					 		if(butler.nextvid>=butler.testvars.length) butler.nextvid = 0;
-				 			return;
-				 case 'b' : showMode = mode.butler;
-				 			butler.butlerData.initButler();
-							return;
-				 case 'v' : showMode = mode.cam;
-							 Executors.newSingleThreadExecutor().execute(new Runnable() {
-								    @Override
-								    public void run() {
-								    	try {
-											Thread.sleep(1000);
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-										}	
-								    	butler.butlerData.stopButler();
-								    }
-								});
-				 			return;
-				 
-			 }
-		}
-	}
-	*/
+

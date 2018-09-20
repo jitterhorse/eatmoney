@@ -8,7 +8,9 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
-public class UDPClient
+import org.bytedeco.javacpp.opencv_shape.ThinPlateSplineShapeTransformer;
+
+public class UDPClient 
 {
 
    DatagramSocket clientSocket;	
@@ -17,6 +19,9 @@ public class UDPClient
    public boolean ismovingUD = false;
    public boolean isZoomIn = false;
    public boolean isZoomOut = false;
+
+	 boolean focusIn = false;
+     boolean focusOut = false;
    
    byte[] speed = {(byte)0x01,(byte)0x02,(byte)0x03,(byte)0x04,(byte)0x05,(byte)0x06,(byte)0x07,(byte)0x08,(byte)0x09,(byte)0x10,(byte)0x11,(byte)0x12,(byte)0x13,(byte)0x14,(byte)0x15,(byte)0x16,(byte)0x17,(byte)0x18};
    byte[] zoomin = {(byte)0x20,(byte)0x21,(byte)0x22,(byte)0x23,(byte)0x24,(byte)0x25,(byte)0x26,(byte)0x27};
@@ -25,22 +30,16 @@ public class UDPClient
    
    int zoomstate = 0;
    int zoomspeed = 0;
+   public int focusMode = 1;
+   
    Thread thread = new Thread();
    
-   public UDPClient(){
-     // byte[] sendData = new byte[1024];
-      //byte[] receiveData = new byte[1024];
-      //String sentence = inFromUser.readLine();
-
-      //byte[] sendData = new byte[] {(byte)0x81,(byte)0x01,(byte)0x04,(byte)0x3F,(byte)0x02,(byte)0x5F,(byte)0xFF};
-      //byte[] sendData = new byte[] {(byte)0x81,(byte)0x01,(byte)0x04,(byte)0x63,(byte)0x04,(byte)0xFF};
- 
-      //DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-      //clientSocket.receive(receivePacket);
-      //String modifiedSentence = new String(receivePacket.getData());
-      //System.out.println("FROM SERVER:" + modifiedSentence);
-      //clientSocket.close();
+   Gamepad gp;
+   
+   public UDPClient(Gamepad _gp){
+	   gp = _gp;
 	   getZoomState();
+	   autoFocus();
    }
    
    public void sendCommand(byte[] sendData) throws Exception{
@@ -71,14 +70,16 @@ public class UDPClient
 	    clientSocket.close();
    }
    
-   public int receiveState() throws Exception{
+   public int receiveState(byte[] sendData) throws Exception{
  
+	   int finalReturn = 0;
+	   
 	   DatagramSocket clientSocket = new DatagramSocket();
 	   InetAddress IPAddress = InetAddress.getByName("192.168.1.88");
 	   clientSocket.connect(IPAddress,1259);
 	   clientSocket.setSoTimeout(1000);
 	   
-	   byte[] sendData = new byte[] {(byte)0x47,(byte)0xFF};
+	   
 	   byte[] commonData = new byte[] {(byte)0x81,(byte)0x09,(byte)0x04};
 	   
 	   
@@ -89,26 +90,54 @@ public class UDPClient
 	   byte c[] = outputStream.toByteArray( );
 	   
 	    DatagramPacket sendPacket = new DatagramPacket(c, c.length);
-	    byte [] vals = new byte[4];
-	    try {
-			clientSocket.send(sendPacket);
-			byte[] buffer = new byte[7];
-			DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-			clientSocket.receive(packet);
-			buffer = packet.getData();
-			vals[0] = buffer[2];
-			vals[1] = buffer[3];
-			vals[2] = buffer[4];
-			vals[3] = buffer[5];       			
-		}catch (SocketException e1) {
-	        System.out.println("Socket closed " + e1);
+	    // if zoomstatecheck
+	    if(sendData[0] == (byte)0x47) {
+	    
+		    byte [] vals = new byte[4];
+		    try {
+				clientSocket.send(sendPacket);
+				byte[] buffer = new byte[7];
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+				clientSocket.receive(packet);
+				buffer = packet.getData();
+				vals[0] = buffer[2];
+				vals[1] = buffer[3];
+				vals[2] = buffer[4];
+				vals[3] = buffer[5];       			
+			}catch (SocketException e1) {
+		        System.out.println("Socket closed " + e1);
+		    }
+		    catch (IOException e) {
+				e.printStackTrace();
+		    }  
+		    clientSocket.close();
+		    finalReturn =  bytesToShort(vals);
 	    }
-	    catch (IOException e) {
-			e.printStackTrace();
-		}
-	    clientSocket.close();
-	    return bytesToShort(vals);
-        //max = 778
+	    //if focusMode check
+	    else if(sendData[0] == (byte)0x38) {
+		    
+		    byte [] vals = new byte[4];
+		    try {
+				clientSocket.send(sendPacket);
+				byte[] buffer = new byte[4];
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+				clientSocket.receive(packet);
+				buffer = packet.getData();
+				vals[0] = buffer[0];
+				vals[1] = buffer[1];
+				vals[2] = buffer[2];
+				vals[3] = buffer[3]; 
+			}catch (SocketException e1) {
+		        System.out.println("Socket closed " + e1);
+		    }
+		    catch (IOException e) {
+				e.printStackTrace();
+			}
+		    clientSocket.close();
+		    finalReturn =  (vals[2] == (byte)0x02) ? 0 : 1;
+	    }       
+	    
+	    return finalReturn;
    }  
    
    
@@ -129,18 +158,54 @@ public class UDPClient
        return l;
    }
       
+
+	public void focus(String string) {
+		byte[] sendData = {};
+		 if(string.equals("far")) {
+		 	 //81 01 04 08 03 FF
+			 this.focusIn = true;
+			 sendData = new byte[] {(byte)0x04,(byte)0x08,(byte)0x30,(byte)0xFF};
+		 }
+		 else if(string.equals("near")) {
+			 //81 01 04 08 02 FF 
+			 this.focusOut = true;
+			 sendData = new byte[] {(byte)0x04,(byte)0x08,(byte)0x20,(byte)0xFF};
+		 }	
+		 
+		 else if(string.equals("stop")) {
+			 //81 01 04 08 00 FF
+			 this.focusIn = false;
+			 this.focusOut = false;
+			 sendData = new byte[] {(byte)0x04,(byte)0x08,(byte)0x00,(byte)0xFF};
+		 }	
+		 try {
+				sendCommand(sendData);
+		 }
+		 catch (Exception e) {
+				e.printStackTrace();
+			}
+	}
+   
    
    public void zoom(String inout) {
 	   byte[] sendData = {};
 	   
 	   if(inout.equals("in")) {
 		   zoomspeed = (int)((1.-((float)zoomstate/(float)778))*(zoomin.length-1));
+		   if(gp.speedCam == true) {
+			   zoomspeed *= 2;
+			   if(zoomspeed >= zoomin.length) zoomspeed = zoomin.length-1;
+		   }
 		   sendData = new byte[] {(byte)0x04,(byte)0x07,zoomin[zoomspeed],(byte)0xFF};
 		   isZoomIn = true;
 		   isZoomOut = false;
 	   }
 	   else if(inout.equals("out")) {
 		   zoomspeed = (int)((1.-((float)zoomstate/(float)778))*(zoomout.length-1));
+		   if(gp.speedCam == true) {
+			   zoomspeed *= 2;
+			   if(zoomspeed >= zoomout.length) zoomspeed = zoomout.length-1;
+		   }
 		   sendData = new byte[] {(byte)0x04,(byte)0x07,zoomout[zoomspeed],(byte)0xFF};
 		   isZoomOut = true;
 		   isZoomIn = false;
@@ -155,7 +220,7 @@ public class UDPClient
 			sendCommand(sendData);
 			if(!thread.isAlive() && (isZoomOut == true || isZoomIn == true)) {
 				//System.out.println("start thread");
-				thread = new Thread(new MyRunnable());
+				thread = new Thread(new ZoomState());
 				thread.start();
 			}
 			else if(thread.isAlive() && (isZoomOut == false && isZoomIn == false)) {
@@ -182,14 +247,14 @@ public class UDPClient
 	    */
    }
    
-   public class MyRunnable implements Runnable {
+   public class ZoomState implements Runnable {
 
 	    public void run(){   
 	       while (!Thread.currentThread().isInterrupted()) {
 	    	   try {
-	    		   	int newstate = receiveState();
+	    		    byte[] sendData = new byte[] {(byte)0x47,(byte)0xFF};
+	    		   	int newstate = receiveState(sendData);
 	    			zoomstate = (newstate > 0 && newstate < 778) ? newstate : zoomstate;
-	    			//System.out.println(zoomstate);
 	    			int zoomspeednew = (int)((1.-((float)zoomstate/(float)778))*zoomin.length);
 	    			if(zoomspeednew != zoomspeed) {
 	    				if(isZoomIn == true) zoom("in");
@@ -201,12 +266,35 @@ public class UDPClient
 	    	   
 	       }
 	    }
-	  }
-
+   }
+   
+   
    public void getZoomState() {
 	   try {
-		zoomstate = receiveState();
-		//System.out.println(zoomstate);
+		byte[] sendData = new byte[] {(byte)0x47,(byte)0xFF};
+		zoomstate = receiveState(sendData);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	   
+   }
+   
+   public void switchFocus() {
+	   try {
+			byte[] sendData = new byte[] {(byte)0x38,(byte)0xFF};
+			focusMode = receiveState(sendData);
+			if(focusMode == 0) manualFocus();
+			else if (focusMode == 1) autoFocus();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		
+	}    
+
+   public void getFocusMode() {
+	   try {
+		byte[] sendData = new byte[] {(byte)0x38,(byte)0xFF};
+		focusMode = receiveState(sendData);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -235,6 +323,7 @@ public class UDPClient
 		   byte ud = (byte)0x01; //up
 		   if(updown > 0) ud = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
+		   if(gp.speedCam == true) speednew *= 2;
 		   byte udspeed = speed[speednew];
 		   
 		   //create leftright byte
@@ -250,6 +339,7 @@ public class UDPClient
 		   byte lr = (byte)0x01; //left
 		   if(leftright > 0) lr = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
+		   if(gp.speedCam == true) speednew *= 2;
 		   byte lrspeed = speed[speednew];
 		   
 		   sendData = new byte[] {(byte)0x06,(byte)0x01,lrspeed,(byte)0x01,lr,(byte)0x03,(byte)0xFF};
@@ -262,6 +352,7 @@ public class UDPClient
 		   byte ud = (byte)0x01; //up
 		   if(updown > 0) ud = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
+		   if(gp.speedCam == true) speednew *= 2;
 		   byte udspeed = speed[speednew];
 		   
 		   sendData = new byte[] {(byte)0x06,(byte)0x01,(byte)0x01,udspeed,(byte)0x03,ud,(byte)0xFF};
@@ -294,7 +385,16 @@ public class UDPClient
    }
    
    public void autoFocus() {
-	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x38,(byte)0x10,(byte)0xFF};
+	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x38,(byte)0x02,(byte)0xFF};
+	   try {
+			sendCommand(sendData);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+   }
+
+   public void manualFocus() {
+	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x38,(byte)0x03,(byte)0xFF};
 	   try {
 			sendCommand(sendData);
 			//System.out.println("save preset");
@@ -326,6 +426,6 @@ public class UDPClient
 			e.printStackTrace();
 		}
    }
-   
-   
+
+ 
 }

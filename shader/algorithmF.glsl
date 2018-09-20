@@ -7,6 +7,7 @@ uniform sampler2D vidtexture;
 uniform sampler2D tracktexture;
 
 uniform vec2 iResolution;
+uniform int status;
 
 varying vec4 vertColor;
 varying vec4 vertTexCoord;
@@ -103,7 +104,7 @@ void main()
     if(uv2.y < 0.0) col2 = vec4(0,0,0,0);
     else if(uv2.y > 0.99) col2 = vec4(0,0,0,0);
         
-    if(uv2.x > 0. && uv2.x < 0.99 && uv2.y > 0.0 && uv2.y < 0.99) col = vec4(0,0,0,0);
+    if(uv2.x > 0. && uv2.x < 0.99 && uv2.y > 0.0 && uv2.y < 0.99) col = vec4(0,0,0,1);
 
   
         
@@ -119,11 +120,28 @@ void main()
     if(uv3.y < 0.0) col3 = vec4(0,0,0,0);
     else if(uv3.y > 0.99) col3 = vec4(0,0,0,0);
         
-    if(uv3.x > 0. && uv3.x < 0.99 && uv3.y > 0.0 && uv3.y < 0.99) col = vec4(0,0,0,0);
+    if(uv3.x > 0. && uv3.x < 0.99 && uv3.y > 0.0 && uv3.y < 0.99) col = vec4(0,0,0,1);
      
+
+        
+     /////////////////////////////// FRAME4
+    vec2 uv5 =  uv * 6.;
+    uv5 -= vec2(0.2,2.2);
+   
+    vec4 col5 = vec4(sobel(step/1280., step/720., uv5),1);
+    
+    
+    if(uv5.x < 0.0) col5 = vec4(0,0,0,0);
+    else if(uv5.x > 0.99) col5 = vec4(0,0,0,0);
+    if(uv5.y < 0.0) col5 = vec4(0,0,0,0);
+    else if(uv5.y > 0.99) col5 = vec4(0,0,0,0);
+        
+    if(uv5.x > 0. && uv5.x < 0.99 && uv5.y > 0.0 && uv5.y < 0.99) col = vec4(0,0,0,1);   
+ 
+      /*
      /////////////////////////////// FRAME3
     vec2 uv4 =  uv * 6.;
-    uv4 -= vec2(0.2,2.2);
+    uv4 -= vec2(0.2,3.2);
    
     vec4 col4 = vec4(texture(vidtexture,uv3).rgb,1.);
     col4.rgb = striping((col4.r + col4.g + col4.b / 3.),uv4);
@@ -134,20 +152,7 @@ void main()
     else if(uv4.y > 0.99) col4 = vec4(0,0,0,0);
         
     if(uv4.x > 0. && uv4.x < 0.99 && uv4.y > 0.0 && uv4.y < 0.99) col = vec4(0,0,0,0);    
-        
-     /////////////////////////////// FRAME4
-    vec2 uv5 =  uv * 6.;
-    uv5 -= vec2(0.2,3.2);
-   
-    vec4 col5 = vec4(sobel(step/1280., step/720., uv5),1);
-    
-    
-    if(uv5.x < 0.0) col5 = vec4(0,0,0,0);
-    else if(uv5.x > 0.99) col5 = vec4(0,0,0,0);
-    if(uv5.y < 0.0) col5 = vec4(0,0,0,0);
-    else if(uv5.y > 0.99) col5 = vec4(0,0,0,0);
-        
-    if(uv5.x > 0. && uv5.x < 0.99 && uv5.y > 0.0 && uv5.y < 0.99) col = vec4(0,0,0,0);   
+    */
  
  
       /////////////////////////////// FRAME5
@@ -162,10 +167,21 @@ void main()
     if(uv6.y < 0.0) col6 = vec4(0,0,0,0);
     else if(uv6.y > 0.99) col6 = vec4(0,0,0,0);
         
-    if(uv6.x > 0. && uv6.x < 0.99 && uv6.y > 0.0 && uv6.y < 0.99) col = vec4(0,0,0,0);         
+    if(uv6.x > 0. && uv6.x < 0.99 && uv6.y > 0.0 && uv6.y < 0.99) col = vec4(0,0,0,1);         
         
         
     // Output to screen
-    gl_FragColor = col + col2 + col3 + col4 + col5 + col6;
+    if(status==0){
+    gl_FragColor = col + col2 + col3 + col5 + col6;
     gl_FragColor += texture2D(tracktexture,vec2(vertTexCoord.s,1.-vertTexCoord.t));
+    }
+    else if(status==1){
+    gl_FragColor = texture(vidtexture,uv);
+    }
+    else if(status ==2){
+    vec4 vi = texture(vidtexture,uv);
+    float bw = vi.r + vi.g + vi.b / 3.;
+    gl_FragColor = vec4(bw,bw,bw,1.);
+    }
+    
 }

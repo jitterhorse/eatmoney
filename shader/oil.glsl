@@ -98,6 +98,6 @@ void main()
     float oil2 = normalize(((p.x) + (p.y)));   
     float v = mix(0.7-oil*oil2,0.5,1.-alpha);
     
-	gl_FragColor = vec4(v, v, v, thresh);
+	gl_FragColor = vec4(v, v, v, thresh*0.9);
 	
 }

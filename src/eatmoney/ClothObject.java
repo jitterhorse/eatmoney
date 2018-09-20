@@ -109,7 +109,7 @@ public class ClothObject {
 	  
 	  ArrayList<DataPacket> currentHandles = new ArrayList<DataPacket>();
 	  ArrayList<GridExpose> currentExposes = new ArrayList<GridExpose>();
-	  ArrayList<textBadge> currentBadges = new ArrayList<textBadge>();
+	  ArrayList<lineAttach> currentBadges = new ArrayList<lineAttach>();
 	  
 	  DwParticle3D[] particles;
 	  int nodedistance = 80; //distance between nodes
@@ -117,7 +117,7 @@ public class ClothObject {
 	  
 	  float[][] norms;
 	  
-	  comments userC;
+	  commentObject userC;
 	  
 	  ArrayList<CommentBlob> currentComments = new ArrayList<CommentBlob>();
 	  
@@ -138,16 +138,16 @@ public class ClothObject {
 		  int col = 0;
 		  int detail = 4;
 		  
-		  public CommentBlob(PVector _origin) {
+		  public CommentBlob(PVector _origin,int len) {
 			  center = _origin;
-			  size.x = parent.random(800)+20;
-			  size.y = parent.random(800)+20;
-			  size.z = parent.random(800)+20;
-			  speeds.x = parent.random(0.2f);
-			  speeds.y = parent.random(0.2f);
-			  speeds.z = parent.random(0.2f);
-			  lifetime += Math.random();
-			  col = parentc.color((float)(Math.random()*100.+155.),(float)(Math.random()*20+30),0.f,(float)(Math.random()*100.+155));
+			  size.x = parent.random(800)+100;
+			  size.y = parent.random(800)+100;
+			  size.z = parent.random(800)+100;
+			  speeds.x = parent.random(0.1f);
+			  speeds.y = parent.random(0.1f);
+			  speeds.z = parent.random(0.1f);
+			  lifetime += Math.random() + len * 0.01;
+			  col = parentc.color((float)(Math.random()*100.+155.),(float)(Math.random()*50+30),0.f,(float)(Math.random()*100.+155));
 			  detail += Math.floor(Math.random()*10);
 			  
 		  }
@@ -175,7 +175,7 @@ public class ClothObject {
 		  
 		  TB = new textBadges(parentc,this);	
 		  
-		  userC = new comments(parent);
+		  userC = new commentObject(parent,parentc);
 		  
 		  texture = parent.createGraphics(2000,2000,PConstants.P2D);
 		  tex = parent.loadShader("shader\\datatexture.glsl");
@@ -189,15 +189,17 @@ public class ClothObject {
 	  }
 	  
 	  public void reState() {
+		  parentc.sendOsc(PApplet.floor((float) (Math.random()*4.)));
 		  if(Math.random() > 0.5 && parentc.generalState > 0.2) {
 			  shake();
 		  }
 		  
-		  else if(Math.random() > 0.8 && parentc.generalState > 0.3) {
+		  else if(Math.random() > 0.8 && parentc.generalState > 0.3) {	  
 			  reshake();
 		  }
 		  
 		  if(Math.random() > 0.5 && parentc.generalState > 0.5) {
+			  
 			  mark();
 		  }
 		  		  
@@ -205,10 +207,12 @@ public class ClothObject {
 			  emit();
 		  }
 		  if(Math.random() > 0.5 && parentc.generalState > 0.7) {
+			  
 			  badges();
 		  }
 		  
 		  if(Math.random() > 0.5 && parentc.generalState > 0.25) {
+			  
 			  DISPLAY_MESH = !DISPLAY_MESH;
 		  }
 		  if(Math.random() > 0.5 && parentc.generalState > 0.35) {
@@ -225,12 +229,12 @@ public class ClothObject {
 			  clothMoverSpeeds[0] = (float) (Math.random()*0.03f);
 			  clothMoverSpeeds[1] = (float) (Math.random()*0.05f);
 		  }
-		  parentc.sendOsc(PApplet.floor((float)Math.random()*5.f));
+		 
 	  }
 	  
 	  
 	  public void resetCloth() {
-		  currentBadges = new ArrayList<textBadge>();
+		  currentBadges = new ArrayList<lineAttach>();
 		  currentHandles = new ArrayList<DataPacket>();
 		  currentExposes = new ArrayList<GridExpose>();
 		  TB.currentBadges = new ArrayList<textB>();
@@ -272,6 +276,7 @@ public class ClothObject {
 		      body.computeNormals();
 		    }
 
+		    
 		    /////////////////////////////////////////////////////////////////////
 		    //////////////////           CALCULATE EXTRAS 
 		    //////////////////////////////////////////////////////////////////
@@ -332,10 +337,10 @@ public class ClothObject {
 			   }
 			   
 			   if(createBadges == true) {
-				   currentBadges = new ArrayList<textBadge>();
+				   currentBadges = new ArrayList<lineAttach>();
 				   for(int i = 0; i < badgeCount; i++) {
 					   int te = particles.length;
-					   textBadge g = new textBadge(parent.floor((float) (Math.random()*te)));
+					   lineAttach g = new lineAttach(parent.floor((float) (Math.random()*te)));
 					   currentBadges.add(g);
 					   
 				   }
@@ -490,7 +495,7 @@ public class ClothObject {
 		    target.popMatrix();
 		    
 		    target.pushMatrix();		    
-		    for(textBadge tb : currentBadges) {
+		    for(lineAttach tb : currentBadges) {
 		    		
 		    		PVector pos = new PVector(particles[tb.id].cx,particles[tb.id].cy,particles[tb.id].cz);
 		    	    PVector position = new PVector(particles[450].cx,particles[450].cy,particles[450].cz);
@@ -517,7 +522,7 @@ public class ClothObject {
 		    
 		    
 		  
-		  if(currentComments.size() > 0) {
+		  if(currentComments.size() > 0 && userC.easing >= 1.) {
 			  CommentBlob c = currentComments.get(currentComments.size()-1);
 			  c.move();
 			  target.pushMatrix();
@@ -537,7 +542,8 @@ public class ClothObject {
 				  c.comments = true;
 			  }
 			  if(c.active == false) currentComments.remove(c);  
-		  	}   
+		  	}
+		  
 		  
 		  
 		  if(cross == true) {
@@ -715,6 +721,7 @@ public class ClothObject {
 
 		  } 
 	  
+	  
 	  //create DataPackets Particles 
 	  void createObj(){
 		     object = parent.createShape();
@@ -794,12 +801,12 @@ public class ClothObject {
 	  
 	  
 	  //textBadges
-	  class textBadge{
+	  class lineAttach{
 		  int id;
 		  float start = 0.f;
 		  float end = 1.f;
  
-		  public textBadge(int _id) {
+		  public lineAttach(int _id) {
 			  this.id = _id;
 			  start = (float) (Math.random() * 0.5 + 0.1);
 			  end = (float) (Math.random() * (1.f-start));
@@ -908,7 +915,8 @@ public class ClothObject {
 			rand.x = (float) (Math.random() * 500.);
 			rand.y = (float) (Math.random() * 500.);
 			rand.z = (float) (Math.random() * 500.);
-			CommentBlob c = new CommentBlob(rand);
+			int len = userC.commentare.get(i).len;
+			CommentBlob c = new CommentBlob(rand,len);
 			currentComments.add(c);
 		}
 
@@ -916,6 +924,7 @@ public class ClothObject {
 	
 	public void stopComment() {
 		currentComments = new ArrayList<CommentBlob>();
+
 		
 	}
 	

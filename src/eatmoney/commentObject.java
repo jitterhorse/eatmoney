@@ -9,17 +9,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+import enums.ObjectMode;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PGraphics;
+import processing.opengl.PShader;
 
-class comments{
+class commentObject{
 
   ArrayList<commentar> commentare;
   DataInputStream in;
   String loadcomm;
   PApplet parent;
+  eatMoneyMain emm;
   PGraphics areaC;
   int current = 0;
   int textSize = 50;
@@ -36,12 +39,15 @@ class comments{
   int[] shiftx = {0,20,40,60,80};
   float distanceComments = 0.2f;
   
-  public comments(PApplet _parent){
+  float easing = 0.f;
+  ObjectMode displaymode = ObjectMode.off;
+  
+  public commentObject(PApplet _parent, eatMoneyMain _emm){
    this.parent = _parent;
+   this.emm = _emm;
    areaC = parent.createGraphics(cWidth,800,PConstants.P2D);
    f = parent.createFont("Inconsolata Regular", 48);
    areaC.textFont(f);
-   
    //this.load();
    scollPosY = areaC.height;
   }
@@ -61,7 +67,9 @@ class comments{
         	String id = line.substring(0, 1);
             String content = line.substring(2);
             int layer = Integer.parseInt(id);
-            commentar uc = new commentar(layer,content,parent);
+            int len = content.length();
+            commentar uc = new commentar(layer,content,len,parent);
+            
             commentare.add(uc);
             line = br.readLine();
         }
@@ -76,9 +84,11 @@ class comments{
   
   public PGraphics draw(PGraphics target){
    target.endDraw();
+
    areaC.beginDraw();
    areaC.clear();
    areaC.translate(0,scollPosY);
+ 
    
    int totallines = 0;
    int totalcomments = 0;
@@ -88,16 +98,16 @@ class comments{
          areaC.pushMatrix();
          areaC.textFont(f);
          areaC.textSize(textSize);
-         areaC.textLeading(textSize*0.8f);
+         areaC.textLeading(textSize*1.0f);
          if(c.alpha < 1.) c.addAlpha();
          float alpha = c.alpha;
-         areaC.fill(255,190*alpha);
+         areaC.fill(255,190*alpha*easing);
          areaC.noStroke();
          //shifty = (countComments * heightSpacebetweenComments) + (inbetweenlines * textLeading) + lines*lineheight
          float shifty = (totalcomments * (textSize*distanceComments)) + totallines*(areaC.textAscent() + areaC.textDescent());
          areaC.rect(5+shiftx[c.layer],shifty,planeWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()),5);  
-         areaC.fill(0,255*alpha);
-         areaC.stroke(0,255*alpha);
+         areaC.fill(0,255*alpha*easing);
+         areaC.stroke(0,255*alpha*easing);
          areaC.text(c.content,10+shiftx[c.layer],shifty,textWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()));   
          areaC.popMatrix();
          totallines += c.lines;
@@ -109,6 +119,7 @@ class comments{
    totallinesFade = parent.lerp(totallinesFade,(float)totallines,0.7f);
    scollPosY = areaC.height - ((totalcommentsFade *  (textSize*distanceComments))+ totallinesFade*(areaC.textAscent() + areaC.textDescent()));
    areaC.endDraw();
+   
    target.beginDraw();
    return areaC;
   }
@@ -124,6 +135,7 @@ class comments{
       else{
         commentare.get(current-1).setVisible(true);
         commentare.get(current-1).alpha = 0.f;
+        emm.sendOsc(5);
       }
   }
 
@@ -135,11 +147,13 @@ class comments{
 	    int lines;
 	    float alpha = 0.f;
 	    int layer = 0;
+	    int len;
 	    
-	    public commentar(int _layer, String _content,PApplet _parent){
+	    public commentar(int _layer, String _content,int _len, PApplet _parent){
 	      content = _content;
 	      parent = _parent;
 	      layer = _layer;
+	      len = _len;
 	      parent.textFont(f);
 	      parent.textSize(textSize);
 	      float tw = parent.textWidth(content);

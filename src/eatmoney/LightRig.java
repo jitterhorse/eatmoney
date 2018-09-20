@@ -26,7 +26,7 @@ public class LightRig {
 	
 	public boolean PLset = true;
 	public boolean ALset = false;
-	public boolean DLset = false;
+	public boolean DLset = true;
 	
 	class LightCol {	
 		float r;

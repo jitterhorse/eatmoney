@@ -188,19 +188,20 @@ public class eatMoneyController {
 			cp.getController("CamPre_"+i).addListener(myListener);
 		}
 	
-		save = cp.addButton("savePreset")
+		for(int i = 0; i < 10; i++) {
+		  cp.addButton("savePreset_"+i)
 	     .setValue(0)
-	     .setPosition(230,10)
+	     .setPosition(230,10+35*i)
 	     .setSize(100,30)
 	     .setGroup(camera)
-	     .setVisible(false)
 	     ;
-		
+		  cp.getController("savePreset_"+i).addListener(myListener);	
+		}
 		
 		camera.setVisible(false);
 		
 		cp.getController("close Presets").addListener(myListener);	
-		cp.getController("savePreset").addListener(myListener);	
+		
 
 		///////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////interaction
@@ -280,14 +281,15 @@ public class eatMoneyController {
 		  cp.addSlider("damp")
 		     .setPosition(450,10)
 		     .setSize(20,300)
-		     .setRange(600,1000)
-		     .setValue(995)
+		     .setRange(6000,10000)
+		     .setValue(9995)
 		     .setGroup(interaction)
 		     ;	
 		  
 		cp.getController("tracking").addListener(myListener);	
 		cp.getController("close interaction").addListener(myListener);
 		cp.getController("clothstate").addListener(myListener);
+		cp.getController("damp").addListener(myListener);
 		cp.getController("reset cloth").addListener(myListener);
 		
 		
@@ -377,7 +379,8 @@ public class eatMoneyController {
 		    	em.generalState = (float)f/(float)100.;
 		    }
 		    else if(theEvent.getController().getName().contains("damp")) {
-		    	em.co.param_cloth_particle.DAMP_VELOCITY  = em.map(theEvent.getController().getValue(),600,1000,0.6f,1.f); 
+		    	float f = em.map(theEvent.getController().getValue(),6000,10000,0.6f,1.f); 
+		    	em.co.param_cloth_particle.DAMP_VELOCITY  = f;
 		    }
 		    
 		    else if(theEvent.getController().getName().contains("CamPre")) {
@@ -385,15 +388,14 @@ public class eatMoneyController {
 		    	s = s.substring(7,8);
 		    	currentPreset = Integer.parseInt(s);
 		    	em.GP.udp.recallPreset(currentPreset);
-		    	save.setPosition(230, 10+35*currentPreset);
-		    	save.setVisible(true);
 		    } 
-		    else if(theEvent.getController().getName().equals("savePreset")) {
+		    else if(theEvent.getController().getName().contains("savePreset")) {
+		    	String s = theEvent.getController().getName();
+		    	s = s.substring(11,12);
 		    	em.GP.udp.savePreset(currentPreset);
+		    	currentPreset = Integer.parseInt(s);
 		    	st = new saveTag(currentPreset);
-		    	//save.setVisible(false);
-		    }  
-		    
+		    }  	    
 		    else if(theEvent.getController().getName().equals("close Presets")) {
 		    	camera.setVisible(false);
 		    	standard.setVisible(true);

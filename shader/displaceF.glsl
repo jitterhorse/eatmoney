@@ -28,6 +28,6 @@ void main(void) {
     
    vec4 col0 = texture2D(texture,newpos);
    
-   gl_FragColor = col0 * (1.+(dispcol.x + dispcol.y)) + dispcol * vec4(0.05,0.05,0.05,0.5);;
+   gl_FragColor = col0 * (1.+(dispcol.x + dispcol.y)) + dispcol * vec4(0.1,0.1,0.1,0.6);;
 
 }

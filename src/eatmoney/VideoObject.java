@@ -20,8 +20,7 @@ public class VideoObject {
 	float easing = 1.f;
 	  
 	  class VideoBlob{
-		  
-		  int mode = 0; // viewsize
+
 		  int id;
 		  PVector position;
 		  boolean visible = true;
@@ -30,10 +29,9 @@ public class VideoObject {
 		  boolean close = false;
 		  int shader = 0;
 		  
-		  public VideoBlob(int nodecount,int _mode,int _shader) {
+		  public VideoBlob(int nodecount,int _shader) {
 			  id = (int) Math.floor(Math.random() * (nodecount));
-			  position = new PVector((float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500,(float)(Math.random()*5000.)-2500);
-			  mode = _mode;
+			  position = new PVector((float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500);
 			  shader = _shader;
 		  }
 		  
@@ -42,7 +40,7 @@ public class VideoObject {
 	public VideoObject(eatMoneyMain _emm) {
 		  parent = _emm;
 		  createVidPlane();
-		  vidTex = parent.loadShader("shader\\bloodyF2.glsl","shader\\bloodyV.glsl");
+		  //vidTex = parent.loadShader("shader\\bloodyF2.glsl","shader\\bloodyV.glsl");
 		  vidTex2 = parent.loadShader("shader\\algorithmF.glsl","shader\\bloodyV.glsl");
 	}
 	
@@ -58,10 +56,6 @@ public class VideoObject {
 		    target.stroke(128,255);
 		    target.line(pos.x,pos.y,pos.z,vb.position.x,vb.position.y,vb.position.z);  
 
-		   
-		    
-		    //vidTex.set("time", (parentc.frameCount * 0.1f));
-		    //vidTex.set("vidtextureold", parentc.vidC.getLastImage());
 			
 			if(parent.vidC.dotracking == true) {
 				target.endDraw();
@@ -76,10 +70,6 @@ public class VideoObject {
 
 			float scale = 800.f;
 			float rotate = 0.f;
-			if(vb.mode == 1) {
-				scale = 600.f;
-				rotate = 0.1f*PConstants.PI;
-			}
 			
 			mat.m00 += rotate *vb.lifetime;
 			target.applyMatrix(mat);
@@ -87,23 +77,15 @@ public class VideoObject {
 			
 			target.scale(vb.lifetime*scale, vb.lifetime * scale,1.f);
 			
-			if(vb.shader == 1) {
+		    vidTex2.set("status",vb.shader);		
 		    vidTex2.set("vidtexture", parent.vidC.getCameraImage());
 		    vidTex2.set("tracktexture", parent.vidC.getTrackingImage());
 		    target.shader(vidTex2);
-			}
-			else if (vb.shader == 2) {
-			vidTex.set("vidtexture", parent.vidC.getCameraImage());
-			vidTex.set("tracktexture", parent.vidC.getTrackingImage());		  
-		    vidTex.set("blurmix", 0.f);
-		    target.shader(vidTex);
-			}
-		   
+   
 		    target.shape(videoPlane);
 		    
-		    if(vb.shader != 0) {
-		    	target.resetShader();
-		    }
+		    target.resetShader();
+		    
 		    target.popMatrix();
 	    }
 	}
@@ -118,9 +100,9 @@ public class VideoObject {
 	}
 	
 	
-	public void newVideoBlob(int channel,int particlecount,int mode,int shader) {
+	public void newVideoBlob(int channel,int particlecount,int shader) {
 		//todo: swicth video channel automatically
-		vb = new VideoBlob(particlecount,mode,shader);	
+		vb = new VideoBlob(particlecount,shader);	
 	}
 	
 	public void closeVideoBlob() {

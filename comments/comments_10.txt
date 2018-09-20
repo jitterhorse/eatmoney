@@ -1,17 +1,16 @@
-0-Ist doch klar, es will keiner gewesen sein
-0-Man muss das differenzierter sehen. Und vielleicht mal in den Spiegel gucken. Wir waren alle dafür.
-0-Wofür? Krankenhäuser schließen? Kann mich nicht erinnern, dass mich jemand gefragt hat.
-0-So ist das, mit Notstandsverordnungen
-0-Erst produzieren wir Not, die Verordnung kommt dann frei Haus.
-0-Nu redet doch mal zur Sache, das ist doch hier kein Spiel!  Da sitzen zwei, die dabei waren, die das alles mitgekriegt haben. Warum habt ihr keine Fragen an die?
-0-Weil wir Hunger haben
-0-Weil es kalt ist
-0-Weil ich ein Update brauch
-0-Weil es nicht regnet
-0-Weil nichts wächst
-0-Ok, ok, versteh ich alles. Aber wer keine Fragen mehr hat, der ist schon tot.
-0-Was hast du denn für Fragen? Stell sie doch.
-0-Was mich echt nicht interessiert, ist, warum sie das gemacht haben. Wer will das noch hören? Jetzt ist am Arsch, jetzt geht es doch darum, ob es weiter geht und wie? Und das will ich von denen hören, die uns den Scheiss eingebrockt haben. Dass es weiter geht, und wie! 
-0-Du willst, dass die dich retten, die das hier angezettelt haben?
-0-Ich will, lieber wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt. Um die Geschichte sollen sich andere kümmern, ich will auf die Insel. 
-0-Du bist wirklich am Arsch, Alter. Träum weiter.
+0-An Leuten wie mir ist das System gescheitert? Wir waren doch alle dafür.
+1-Wofür? Krankenhäuser schließen? Hat mich keiner gefragt.
+1-So ist das, mit Notstandsverordnungen
+2-Erst produzieren wir Not, die Verordnung kommt dann frei Haus.
+0-Nu redet doch mal zur Sache, das ist doch hier kein Spiel!  Da sitzen zwei, die dabei waren. Warum habt ihr keine Fragen an die?
+1-Weil wir Hunger haben
+1-Weil es kalt ist
+1-Weil ich ein Update brauch
+1-Weil es nicht regnet
+1-Weil nichts wächst
+1-Aber wer keine Fragen mehr hat, der ist schon tot.
+2-Dann frag doch
+0-Ich will nicht wissen, warum sie das gemacht haben. Wer will das noch hören? Jetzt ist am Arsch, jetzt geht es doch darum, ob es weiter geht und wie! Und das will ich von denen hören, die uns den Scheiss eingebrockt haben. Dass es weiter geht, und wie!
+1-Du willst, dass die dich retten, die das hier angezettelt haben?
+1-Ich will wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt. Um die Geschichte sollen sich andere kümmern, ich will auf die Insel. 
+2-Du bist wirklich am Arsch, Alter. Träum weiter.
