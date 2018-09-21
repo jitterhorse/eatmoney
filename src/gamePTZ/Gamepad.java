@@ -29,14 +29,17 @@ public class Gamepad{
 	ControlSlider[] slider;
 	float [] sliderValues;
 	
-	 public UDPClient udp;
+	public UDPClient udp;
 	 
-	 boolean savestate = false;
-	 boolean recallstate = false;
-	 boolean focusstate = false;
-	 boolean speedCam = false;
-
-	
+	boolean savestate = false;
+	boolean recallstate = false;
+	boolean focusstate = false;
+	 
+	boolean changepreset = false;
+	boolean firepreset = false;
+	 
+	int currHandle = 0;
+	 
 	//slider 0 & 1 is camera leftright & camera updown
 	//button 6 & 8 are camera zoomin zoomout
 	
@@ -59,6 +62,7 @@ public class Gamepad{
 	      slider = new ControlSlider[numS];
 	      sliderValues = new float[numS];
 	      
+	      
 	      for(int i = 0; i < numB; i++) {
 				buttons[i] = cd.getButton(i);
 				buttonValues[i] = buttons[i].pressed();
@@ -75,19 +79,30 @@ public class Gamepad{
 	
 	
 	public void update() {
+		
+
 		for(int i = 0; i < slider.length; i++) {
 			sliderValues[i] = round1(slider[i].getValue(),1);	
 		}
 		for(int i = 0; i < buttons.length; i++) {
 			buttonValues[i] = buttons[i].pressed();	
+			//if(buttonValues[i] == true) System.out.println(i);
 		}
+
 		
 		//move camera
 		if(((sliderValues[0] != 0.0f || sliderValues[1] != 0.0f) &&  (this.udp.ismovingLR == false || this.udp.ismovingUD == false))
-			|| (this.udp.ismovingLR == true || this.udp.ismovingUD == true && sliderValues[0] == 0 && sliderValues[1] == 0) ) {
-			this.udp.moveNew(sliderValues[1], sliderValues[0]);
-			//System.out.println("move cam" + sliderValues[1] + " / " + sliderValues[0]);
+			|| (this.udp.ismovingLR == true || this.udp.ismovingUD == true && (sliderValues[0] == 0 && sliderValues[1] == 0)) && currHandle != 1 ) {
+			this.udp.moveNew(sliderValues[1], sliderValues[0],2);
+			currHandle = 2;
 		}
+		
+		else if(((sliderValues[3] != 0.0f || sliderValues[4] != 0.0f) &&  (this.udp.ismovingLR == false || this.udp.ismovingUD == false))
+				|| (this.udp.ismovingLR == true || this.udp.ismovingUD == true && (sliderValues[3] == 0 && sliderValues[4] == 0)) && currHandle != 2 ) {
+				this.udp.moveNew(sliderValues[4], sliderValues[3],1);	
+				currHandle = 1;
+			}
+		
 		//zoom camera
 		if(buttonValues[8] == true && this.udp.isZoomIn == false) {
 			//System.out.println("in zoom");
@@ -102,13 +117,6 @@ public class Gamepad{
 			this.udp.zoom("stop");
 		}
 		
-		//button 9 == speedup camera
-		if(buttonValues[9] == true && speedCam == false) {
-			speedCam =true;
-		}
-		else if(buttonValues[9] == false && speedCam == true) {
-			speedCam =false;
-		}
 		//button 2 switch focus
 		if(buttonValues[2] == true && focusstate == false) {
 			focusstate = true;
@@ -130,6 +138,27 @@ public class Gamepad{
 
 		else if((buttonValues[1] == false && buttonValues[3] == false) && ( this.udp.focusIn == true || this.udp.focusOut == true)) {
 			this.udp.focus("stop");
+		}
+		
+		// change preset with pad
+		if(buttonValues[0] == true && changepreset == false) {
+			changepreset = true;
+			int val = 0;
+			if(buttons[0].getValue() == 2.0) val = -1;
+			else if(buttons[0].getValue() == 6.0) val = 1;
+			emm.cont.changePreset(val);
+		}
+		else if(buttonValues[0] == false && changepreset == true) {
+			changepreset = false;
+		}
+		
+		// fire preset with pad
+		if(buttonValues[7] == true && firepreset == false) {
+			firepreset = true;
+			emm.cont.firePreset();
+		}
+		else if(buttonValues[7] == false && firepreset == true) {
+			firepreset = false;
 		}
 		
 	}

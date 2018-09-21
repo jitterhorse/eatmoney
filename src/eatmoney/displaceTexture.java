@@ -19,7 +19,7 @@ public class displaceTexture {
 	public int contentID  = 0; // number of content to use
 	public boolean display = false;
 	
-	String[] contents = {"LET THEM EAT MONEY", "WWW.OCEAN-CITIES.COM"};
+	String[] contents = {"LET-THEM-EAT-MONEY.COM","UPDATE", "NOVA.OCEANCITIES.COM/4.0","RECEIVING DATA"};
 	
 	public displaceTexture(PApplet _parent,int width, int height) {
 		this.parent = _parent;

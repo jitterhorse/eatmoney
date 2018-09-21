@@ -49,7 +49,7 @@ public class eatMoneyMain extends PApplet {
 	public int mainDisplayWidth = 1920;
 	
 	//create controller surface
-	eatMoneyController cont;
+	public eatMoneyController cont;
 	
 	//calibrate projector
 	public Calibrate cal;
@@ -89,13 +89,18 @@ public class eatMoneyMain extends PApplet {
 	public mode showMode = mode.cloth;
 
 	PShader glow,side;
+	public boolean fader = true;
+	float blackfade = 1.f;
+	
 	
     PVector cameraSlidePos = new PVector(0,0,0);
     PVector cameraNewPos = new PVector(0,0,0);
     PVector middleSlidePos = new PVector(0,0,0);	
 	
-    PFont f;
+    PFont fn;
     
+    public Presets presets;
+    public ClothStates cstates;
 	
 	public static void main(String[] args) {
 		PApplet.main("eatmoney.eatMoneyMain");
@@ -110,9 +115,12 @@ public class eatMoneyMain extends PApplet {
 	
 	public void setup() {
 		frameRate(30);
-		f = createFont("DejaVu Sans Mono", 24);
-		textFont(f);
-		myRemoteLocation = new NetAddress("192.168.1.13",8521);
+		fn = createFont("DejaVu Sans Mono", 24);
+		textFont(fn);
+		myRemoteLocation = new NetAddress("192.168.1.6",8521);
+		
+		cstates = new ClothStates(this);
+		presets = new Presets(this);
 		
 		cont = new eatMoneyController(this,this);	
 		oscP5 = new OscP5(this,7000);	
@@ -121,6 +129,7 @@ public class eatMoneyMain extends PApplet {
 		vo = new VideoObject(this);
 		GP = new Gamepad(this);
 		mm = new MidiMixer(this);
+		
 	}
 	
 	public void setupCalibration(String filename, boolean newCalibration) {
@@ -166,14 +175,12 @@ public class eatMoneyMain extends PApplet {
 		camTargetnew = new PVector(width/2.0f, height/2.0f,0);
 		camPos = new PVector(width/2.0f, height/2.0f, (height/2.0f) / tan(PI*30.0f / 180.0f));
 		camPosnew = new PVector(width/2.0f, height/2.0f, (height/2.0f) / tan(PI*30.0f / 180.0f));
+		cont.firePreset();
 	}
 	
 
 	
 	public void draw() {
-		 
-		
-		
 		clear();
 		background(0);
 		
@@ -241,6 +248,9 @@ public class eatMoneyMain extends PApplet {
 		  		else if(co.cc == clothCenter.pin) {
 			  		cameraspeed = 0.02f;
 			  		middle = co.getPinMiddle();
+			  		if(random((float) 1.) > 0.99f) {
+			  			
+			  		}
 				    cameraNewPos.x = middle.x+100;
 				    cameraNewPos.y = middle.y+100;
 				    cameraNewPos.z = middle.z-400;				     
@@ -260,11 +270,6 @@ public class eatMoneyMain extends PApplet {
 		  	else if(showMode == mode.comment) {
 		  		 middle = co.getCommentMiddle();
 		  		 
-		  		 //auto step to new state after comments over
-		  		 /*if(co.currentComments.size() <= 0) {
-		  			 follow = Follow.cloth;
-		  			 cameraspeed = 0.02f;
-		  		 }*/
 		  		 cameraNewPos.x = middle.x+400;
 				 cameraNewPos.y = middle.y+400;
 				 cameraNewPos.z = middle.z-100;
@@ -289,10 +294,10 @@ public class eatMoneyMain extends PApplet {
 		  		offset = bo.camoffset;
 		  		middle = bo.butlerMean;
 		  		middle.add(bo.ButlerOffset);
-		  		if(random(1.f)>0.95f) {
+		  		if(random(1.f)>0.99f) {
   				  camPosnew = new PVector((random(1.f) *1600)-800.f,(random(1.f) * 200)-70,(random(1.f) *1200)-200.f);
   				  camPosnew.add(bo.ButlerOffset);
-  				  cameraspeed = random(0.01f,0.05f);
+  				  cameraspeed = random(0.005f,0.01f);
   				  bo.camoffset.x = random(-400,400);
   				  bo.camoffset.y = random(-40,40);
   				  bo.camoffset.z = random(-290,-40);
@@ -452,11 +457,22 @@ public class eatMoneyMain extends PApplet {
 		    ///////////////////////////////////////////////////
 		    //////////////MAIN CONTENT
 		    ///////////////////////////////////////////////////
+		    if(fader==true && blackfade < 1.) {
+		    	blackfade += 0.01;
+		    	if(blackfade > 0.99) blackfade = 1.f;
+		    }
+
+		    else if(fader==false && blackfade > 0.) {
+		    	blackfade -= 0.01;
+		    	if(blackfade < 0.01) blackfade = 0.f;
+		    }		    
+		    
 		    
 		    layer.beginDraw();
 		    layer.clear();
 			//glow.set("iGlobalTime", frameRate * 0.2f); 
 			side.set("iTime", frameRate * 0.2f); 
+			side.set("black", blackfade);
 			layer.shader(side);
 			//layer.shader(glow);
 		    layer.image(mc,0,0);
@@ -505,16 +521,17 @@ public class eatMoneyMain extends PApplet {
 			textSize(14);
 			  
 		    image(layer,0,0,960*Planes,540);
-		    image(vidC.getCameraImage(),1920-640,540,640,360);
+		    image(vidC.getCameraImage(),960,0,960,540);
 		  
 		    textSize(20);
 		    textAlign(RIGHT,TOP);
-		    
-		    text("detection: " + fm.detection,1920-650,1080-300);
-		    text("LM: " + fm.landmarks.size(),1920-650,1080-270);
 
 		    String foc = (GP.udp.focusMode == 0) ? "MF" : "AF";
-		    text("focus: " + foc,1920-660,570);
+		    text("focus: " + foc,1900,570);
+		    
+		    text("detection: " + fm.detection,1900,600);
+
+
 		    
 		    //show save button
 		    if(runStatus == status.CAMPRE) {
@@ -532,14 +549,15 @@ public class eatMoneyMain extends PApplet {
 			 	}			
 			 }		  
 		}				
-		stroke(255,255);
-		int f = 0;
-		if(co != null && co.currentComments != null) {
-			f = co.currentComments.size();
+		
+		
+		// SHOW FPS STATUS
+		if(runStatus == status.RUN || runStatus == status.CAMPRE) {
+			stroke(255,255);
+			textSize(15);
+			textAlign(LEFT,TOP);
+		    text("FPS: " + frameRate + " / SHOWMODE: " + showMode  +" / Fade: " + blackfade,20,570);
 		}
-		textSize(15);
-		textAlign(LEFT,TOP);
-	    text("FPS: " + frameRate + " / " + showMode  +" / " + f,50,50);
 	    
 	}
 	
@@ -686,6 +704,11 @@ public class eatMoneyMain extends PApplet {
 			 showMode = mode.empty;
 	}
 	
+	public void changeCloth(int id) {
+		cstates.loadState(id);
+	}
+	
+	
 	public void keyPressed() {
 		  switch(key) {
 		  case '0' : showEmpty();
@@ -724,16 +747,22 @@ public class eatMoneyMain extends PApplet {
 			 	     return;
 		  case 't' : co.textureAlpha = (co.textureAlpha == 0.f) ? 1.f : 0.f;
 		  			 return;
-		  case 'z' : showInsert(1);
+		  case 'z' : showInsert(0);
 			 		 return;		  			 
-		  
-		  case 'a' : mm.switchCh(0, 0);
+		  case 'u' : showInsert(1);
+	 		 		 return; 
+		  case 'i' : showInsert(2);
+		  			 return; 			 		 
+		  case 'o' : showInsert(3);
+		  			 return; 				 		 
+			 		 
+		  case 'a' : mm.switchCh(0);
 		  			 return;
-		  case 's' : mm.switchCh(1, 0);
+		  case 's' : mm.switchCh(1);
 			 		 return;		 
-		  case 'd' : mm.switchCh(2, 0);
+		  case 'd' : mm.switchCh(2);
 		  			 return;
-		  case 'f' : mm.switchCh(3, 0);
+		  case 'f' : mm.switchCh(3);
 		  		     return;		  			 
 
 		  case 'g' : mm.switchPreset(0);
@@ -743,8 +772,8 @@ public class eatMoneyMain extends PApplet {
 		  }  
 	  }
 	
-	private void showInsert(int i) {
-		dt.contentID = (random(1.f) > 0.5f) ? 1 : 0;
+	void showInsert(int i) {
+		dt.contentID = i;
 		dt.display = true;
 		dt.setupTex();
 	}

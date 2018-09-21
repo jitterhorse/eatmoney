@@ -137,16 +137,18 @@ public class ClothObject {
 		  PVector speeds = new PVector(0,0,0);
 		  int col = 0;
 		  int detail = 4;
+		  int len;
 		  
-		  public CommentBlob(PVector _origin,int len) {
+		  public CommentBlob(PVector _origin,int _len) {
 			  center = _origin;
-			  size.x = parent.random(800)+100;
-			  size.y = parent.random(800)+100;
-			  size.z = parent.random(800)+100;
+			  len = _len;
+			  size.x = parent.random(700)+100;
+			  size.y = parent.random(700)+100;
+			  size.z = parent.random(700)+100;
 			  speeds.x = parent.random(0.1f);
 			  speeds.y = parent.random(0.1f);
 			  speeds.z = parent.random(0.1f);
-			  lifetime += Math.random() + len * 0.01;
+			  lifetime += (float)len * 0.025;		  
 			  col = parentc.color((float)(Math.random()*100.+155.),(float)(Math.random()*50+30),0.f,(float)(Math.random()*100.+155));
 			  detail += Math.floor(Math.random()*10);
 			  
@@ -206,13 +208,11 @@ public class ClothObject {
 		  if(Math.random() > 0.5 && parentc.generalState > 0.1) {
 			  emit();
 		  }
-		  if(Math.random() > 0.5 && parentc.generalState > 0.7) {
-			  
+		  if(Math.random() > 0.5 && parentc.generalState > 0.7) {  
 			  badges();
 		  }
 		  
-		  if(Math.random() > 0.5 && parentc.generalState > 0.25) {
-			  
+		  if(Math.random() > 0.5 && parentc.generalState > 0.25) {	  
 			  DISPLAY_MESH = !DISPLAY_MESH;
 		  }
 		  if(Math.random() > 0.5 && parentc.generalState > 0.35) {
@@ -523,7 +523,8 @@ public class ClothObject {
 		    
 		  
 		  if(currentComments.size() > 0 && userC.easing >= 1.) {
-			  CommentBlob c = currentComments.get(currentComments.size()-1);
+			  //CommentBlob c = currentComments.get(currentComments.size()-1);
+			  CommentBlob c = currentComments.get(0);
 			  c.move();
 			  target.pushMatrix();
 			  target.translate(c.activePosition.x, c.activePosition.y,c.activePosition.z);
@@ -915,7 +916,8 @@ public class ClothObject {
 			rand.x = (float) (Math.random() * 500.);
 			rand.y = (float) (Math.random() * 500.);
 			rand.z = (float) (Math.random() * 500.);
-			int len = userC.commentare.get(i).len;
+			int len = 1;
+			if(i != 0) len = userC.commentare.get(i-1).len;
 			CommentBlob c = new CommentBlob(rand,len);
 			currentComments.add(c);
 		}

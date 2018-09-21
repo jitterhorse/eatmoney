@@ -2,6 +2,7 @@
 
 uniform float iTime;
 uniform sampler2D texture;
+uniform float black;
 
 varying vec4 vertTexCoord;
 
@@ -21,5 +22,5 @@ void main()
     float w = min(y,z);
     
     // Output to screen
-    gl_FragColor =  col * w;
+    gl_FragColor =  col * w * black;
 }

@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import controlP5.Button;
+import controlP5.CColor;
 import controlP5.ControlEvent;
 import controlP5.ControlListener;
 import controlP5.ControlP5;
 import controlP5.Group;
 import controlP5.RadioButton;
 import controlP5.ScrollableList;
+import controlP5.Slider;
 import controlP5.Textfield;
 import controlP5.Textlabel;
 import controlP5.Toggle;
@@ -26,9 +28,9 @@ public class eatMoneyController {
 
 	eatMoneyMain em;
 	PApplet parent;
-	ControlP5 cp;
+	public ControlP5 cp;
 	MyControlListener myListener;
-	Group standard, calibrate, pre, camera, interaction;
+	Group standard, calibrate, pre, camera, interaction, presets;
 	
 	Toggle monitorT;
 	ScrollableList files;
@@ -39,10 +41,19 @@ public class eatMoneyController {
 	RadioButton r1, r2;
 	Button save;
 	
+	Button[] presetButtons;
+	
+	public Slider state,damping;
+	
+	int nextPreset = 0;
+	int lastrunning = 0;
+	int coloractive;
+	int colorinactive;
+	int colorrunning;
+	
 	PFont font;
 	ArrayList<String> oldFiles;
 	
-	int currentPreset = 0;
 	int currentComment = 0;
 	
 	public saveTag st;
@@ -65,7 +76,10 @@ public class eatMoneyController {
 		em = _em;
 		font = em.createFont("Arial",15);
 		cp = new ControlP5(parent);
-		cp.setPosition(0, 0);
+		cp.setPosition(0, 610);
+		coloractive = em.color(200,60,60);
+		colorinactive = em.color(60,70,60);
+		colorrunning = em.color(100,100,120);
 		myListener = new MyControlListener();
 		loadFiles();
 		
@@ -74,7 +88,7 @@ public class eatMoneyController {
 		///////////////////////////////////////////////////////////////////
 		
 		pre = cp.addGroup("prerequisites")
-                .setPosition(0,560)
+                .setPosition(0,0)
                 .setBackgroundHeight(450)
                 .setWidth(500)
                 .setBackgroundColor(em.color(35))
@@ -136,7 +150,7 @@ public class eatMoneyController {
 		///////////////////////////////////////////////////////////////////
 	    
 		calibrate = cp.addGroup("calibrate")
-                .setPosition(0,560)
+                .setPosition(0,0)
                 .setBackgroundHeight(450)
                 .setWidth(200)
                 .setBackgroundColor(em.color(35))
@@ -164,7 +178,7 @@ public class eatMoneyController {
 		///////////////////////////////////////////////////////////////////
 		
 		camera = cp.addGroup("camera")
-                .setPosition(0,560)
+                .setPosition(0,0)
                 .setBackgroundHeight(450)
                 .setWidth(1000)
                 .setBackgroundColor(em.color(0))
@@ -202,13 +216,45 @@ public class eatMoneyController {
 		
 		cp.getController("close Presets").addListener(myListener);	
 		
-
+		///////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////SHOW PRESETS
+		///////////////////////////////////////////////////////////////////
+		
+		presets = cp.addGroup("presets")
+                .setPosition(540,0)
+                .setBackgroundHeight(450)
+                .setWidth(500)
+                .setBackgroundColor(em.color(0))
+                .disableCollapse()
+                ;
+		
+		presetButtons = new Button[em.presets.allPresets.size()];
+		
+		for(int i = 0; i<em.presets.allPresets.size();i++) {
+			int row = i % 10;
+			int col = em.floor(((float)i/(float)10));
+			
+			Button b = cp.addButton("preset_" +i)
+		     .setPosition(20 + (120 *col),10 + 35 * row)
+		     .setSize(100,30)
+		     .setValue(0)
+             .setFont(font)
+		     .setGroup(presets)
+		     .setColorBackground(colorinactive)
+		     ;
+			 cp.getController("preset_" +i).addListener(myListener);
+			
+			 presetButtons[i] = b;
+		}
+		
+		presets.setVisible(false);
+		
 		///////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////interaction
 		///////////////////////////////////////////////////////////////////
 		
 		interaction = cp.addGroup("interaction")
-                .setPosition(0,560)
+                .setPosition(0,0)
                 .setBackgroundHeight(450)
                 .setWidth(500)
                 .setBackgroundColor(em.color(0))
@@ -256,9 +302,19 @@ public class eatMoneyController {
 	     .setSize(100,30)
 	     .setGroup(interaction)
 	     ;	
+		
+		cp.addButton("fade")
+	     .setValue(1)
+	     .setPosition(120,290)
+	     .setSize(100,30)
+	     .setGroup(interaction)
+	     ;	
+		
 		cp.getController("setPL").addListener(myListener);
 		cp.getController("setDL").addListener(myListener);
 		cp.getController("setAL").addListener(myListener);
+		
+		cp.getController("fade").addListener(myListener);
 		
 		for(int i = 1; i <= 11; i++) {
 			cp.addButton("comment_"+i)
@@ -270,7 +326,7 @@ public class eatMoneyController {
 			cp.getController("comment_"+i).addListener(myListener);
 		}
 		
-		  cp.addSlider("clothstate")
+		  state = cp.addSlider("clothstate")
 		     .setPosition(350,10)
 		     .setSize(20,300)
 		     .setRange(0,100)
@@ -278,7 +334,7 @@ public class eatMoneyController {
 		     .setGroup(interaction)
 		     ;
 		  
-		  cp.addSlider("damp")
+		  damping = cp.addSlider("damp")
 		     .setPosition(450,10)
 		     .setSize(20,300)
 		     .setRange(6000,10000)
@@ -300,7 +356,7 @@ public class eatMoneyController {
 		///////////////////////////////////////////////////////////////////
 		
 		standard = cp.addGroup("standard")
-                .setPosition(0,560)
+                .setPosition(0,0)
                 .setBackgroundHeight(450)
                 .setWidth(500)
                 .setBackgroundColor(em.color(0))
@@ -367,6 +423,7 @@ public class eatMoneyController {
 		    else if(theEvent.getController().getName().equals("interact")) {
 		    	standard.setVisible(false);
 		    	interaction.setVisible(true);
+		    	presets.setVisible(true);
 		    }		    
 		    else if(theEvent.getController().getName().contains("comment")) {
 		    	String s = theEvent.getController().getName();
@@ -386,15 +443,13 @@ public class eatMoneyController {
 		    else if(theEvent.getController().getName().contains("CamPre")) {
 		    	String s = theEvent.getController().getName();
 		    	s = s.substring(7,8);
-		    	currentPreset = Integer.parseInt(s);
-		    	em.GP.udp.recallPreset(currentPreset);
+		    	em.GP.udp.recallPreset(Integer.parseInt(s));
 		    } 
 		    else if(theEvent.getController().getName().contains("savePreset")) {
 		    	String s = theEvent.getController().getName();
 		    	s = s.substring(11,12);
-		    	em.GP.udp.savePreset(currentPreset);
-		    	currentPreset = Integer.parseInt(s);
-		    	st = new saveTag(currentPreset);
+		    	em.GP.udp.savePreset(Integer.parseInt(s));
+		    	st = new saveTag(Integer.parseInt(s));
 		    }  	    
 		    else if(theEvent.getController().getName().equals("close Presets")) {
 		    	camera.setVisible(false);
@@ -464,10 +519,21 @@ public class eatMoneyController {
 		    else if(theEvent.getController().getName().equals("setDL")) {
 		    	em.lightRig.DLset = ! em.lightRig.DLset;
 		    }
-		    
+		    else if(theEvent.getController().getName().equals("fade")) {
+		    	em.fader = !em.fader;
+		    	
+		    }
+		    else if(theEvent.getController().getName().startsWith("preset_")){
+		    	String s = theEvent.getController().getName();
+		    	s = s.substring(7,8);
+		    	//em.presets.loadPreset(Integer.parseInt(s));
+		    	firePresetMouse(Integer.parseInt(s));
+		    }
+
 		    
 		    else if(theEvent.getController().getName().equals("close interaction")) {
 		    	interaction.setVisible(false);
+		    	presets.setVisible(false);
 		    	standard.setVisible(true);
 		    }		    
 		   
@@ -509,10 +575,36 @@ public class eatMoneyController {
 		  if (listOfFiles[i].isFile()) {
 			  oldFiles.add(listOfFiles[i].getName());
 		  } 
-		}
-		
+		}	
 	}
 		
-
+	public void firePreset() {
+		em.presets.loadPreset(nextPreset);
+		changePreset(1);
+	}
+	
+	public void changePreset(int dir) {
+		presetButtons[nextPreset].setColorBackground(colorinactive);
+		nextPreset += dir;
+		if(nextPreset >= presetButtons.length-1) nextPreset = presetButtons.length-1;
+		else if(nextPreset <= 0) nextPreset = 0;
+		presetButtons[nextPreset].setColorBackground(coloractive);
+	}
+	
+	public void firePresetMouse(int target) {
+		em.presets.loadPreset(target);
+		changePresetMouse(target);
+	}
+	
+	
+	public void changePresetMouse(int target) {
+		presetButtons[nextPreset].setColorBackground(colorinactive);
+		nextPreset = target+1;
+		if(nextPreset >= presetButtons.length-1) nextPreset = presetButtons.length-1;
+		else if(nextPreset <= 0) nextPreset = 0;
+		presetButtons[nextPreset].setColorBackground(coloractive);
+		
+	}
+	
 	
 }

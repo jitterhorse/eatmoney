@@ -46,7 +46,7 @@ class commentObject{
    this.parent = _parent;
    this.emm = _emm;
    areaC = parent.createGraphics(cWidth,800,PConstants.P2D);
-   f = parent.createFont("Inconsolata Regular", 48);
+   f = parent.createFont("Iosevka", 50);
    areaC.textFont(f);
    //this.load();
    scollPosY = areaC.height;
@@ -66,6 +66,7 @@ class commentObject{
         while (line != null) {
         	String id = line.substring(0, 1);
             String content = line.substring(2);
+            
             int layer = Integer.parseInt(id);
             int len = content.length();
             commentar uc = new commentar(layer,content,len,parent);
@@ -104,11 +105,11 @@ class commentObject{
          areaC.fill(255,190*alpha*easing);
          areaC.noStroke();
          //shifty = (countComments * heightSpacebetweenComments) + (inbetweenlines * textLeading) + lines*lineheight
-         float shifty = (totalcomments * (textSize*distanceComments)) + totallines*(areaC.textAscent() + areaC.textDescent());
+         float shifty = (totalcomments * (textSize*distanceComments)) + totallines*((areaC.textAscent() + areaC.textDescent()));
          areaC.rect(5+shiftx[c.layer],shifty,planeWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()),5);  
          areaC.fill(0,255*alpha*easing);
          areaC.stroke(0,255*alpha*easing);
-         areaC.text(c.content,10+shiftx[c.layer],shifty,textWidth[c.layer],c.lines * (areaC.textAscent() + areaC.textDescent()));   
+         areaC.text(c.content,10+shiftx[c.layer],shifty,textWidth[c.layer],c.lines * ((areaC.textAscent() + areaC.textDescent())));   
          areaC.popMatrix();
          totallines += c.lines;
          totalcomments++;

@@ -1,0 +1,301 @@
+[
+    {
+    "id" : 0,
+    "visible" : 0,
+    "cloth": 0,
+    "preset" : 0
+    },
+    {
+  	"id" : 1,
+  	"visible" : 1,
+  	"ptz" : 0,
+  	"cam" : 2,
+  	"shader" : 1
+    },
+    {
+    "id" : 2,
+  	"osd": 0
+    },
+    {
+  	"id" : 3,
+    "visible" : 2,
+    "comment": 1
+    },
+    {
+  	"id" : 4,
+    "visible" : 3
+    },
+    {
+    "id" : 5,
+  	"osd": 1
+    },
+    {
+    "id" : 6,
+    "visible" : 0,
+	"cloth" : 1
+    },
+    {
+  	"id" : 7,
+  	"visible" : 1,
+  	"ptz" : 1,
+  	"cam" : 2,
+  	"shader" : 0
+    },
+    {
+    "id" : 8,
+    "visible" : 0,
+	"cloth" : 3
+    },
+    {
+  	"id" : 9,
+    "visible" : 2,
+    "comment": 2
+    },
+    {
+    "id" : 10,
+    "visible" : 0,
+	"cloth" : 1
+    },
+    {
+  	"id" : 11,
+  	"visible" : 1,
+  	"ptz" : 0,
+  	"cam" : 2,
+  	"shader" : 1
+    },
+    {
+  	"id" : 12,
+    "visible" : 2,
+    "comment": 3
+    },
+    {
+    "id" : 13,
+    "visible" : 0,
+	"cloth" : 2
+    },
+  	{
+  	"id" : 14,
+    "visible" : 3
+    },
+    {
+    "id" : 15,
+    "visible" : 0,
+	"cloth" : 2
+    },
+    {
+  	"id" : 16,
+  	"visible" : 1,
+  	"cam" : 3,
+  	"shader" : 1
+    },
+   	{
+  	"id" : 17,
+    "visible" : 0
+  	},
+  	{
+  	"id" : 18,
+  	"visible" : 1,
+  	"ptz" : 1,
+  	"cam" : 2,
+  	"shader" : 0
+    },
+    {
+  	"id" : 19,
+    "visible" : 0
+  	},
+  	{
+  	"id" : 20,
+  	"visible" : 1,
+  	"ptz" : 1,
+  	"cam" : 2,
+  	"shader" : 0
+    },
+   	{
+  	"id" : 21,
+    "visible" : 3
+    },
+    {
+    "id" : 22,
+  	"osd": 2
+    },
+   	{
+  	"id" : 23,
+    "visible" : 0
+  	},
+  	{
+  	"id" : 24,
+    "visible" : 2,
+    "comment": 4
+    },
+	{
+  	"id" : 25,
+    "visible" : 0
+  	},
+  	{
+  	"id" : 26,
+  	"visible" : 1,
+  	"ptz" : 1,
+  	"cam" : 2,
+  	"shader" : 0
+    },
+	{
+  	"id" : 27,
+    "visible" : 0,
+    "cloth" : 2
+  	},
+  	{
+  	"id" : 28,
+  	"visible" : 1,
+  	"cam" : 2,
+  	"preset" : 1,
+  	"shader" : 1
+    },
+    {
+  	"id" : 29,
+    "visible" : 2,
+    "comment": 5
+  	},
+    {
+  	"id" : 30,
+    "visible" : 0,
+    "cloth" : 3
+  	},
+    {
+  	"id" : 31,
+    "visible" : 2,
+    "comment": 6
+  	},
+  	    {
+  	"id" : 32,
+    "visible" : 0,
+    "cloth" : 1
+  	},
+  	{
+  	"id" : 33,
+  	"visible" : 1,
+  	"ptz" : 2,
+  	"cam" : 2,
+  	"shader" : 0
+    },
+    {
+  	"id" : 34,
+    "visible" : 0,
+    "cloth" : 3
+  	},
+  	{
+  	"id" : 35,
+    "visible" : 2,
+    "comment": 7
+  	},
+  	{
+  	"id" : 36,
+    "visible" : 0,
+    "cloth" : 1
+  	},
+  	{
+  	"id" : 37,
+  	"visible" : 1,
+  	"preset" : 1,
+  	"shader" : 1
+    },
+    {
+  	"id" : 38,
+    "visible" : 0,
+    "cloth" : 0
+  	},
+  	{
+  	"id" : 39,
+    "visible" : 2,
+    "comment": 9
+  	},
+  	{
+  	"id" : 40,
+    "visible" : 0,
+    "cloth" : 1
+  	},
+   	{
+  	"id" : 41,
+  	"visible" : 1,
+  	"preset" : 1,
+  	"shader" : 1
+    },
+    {
+  	"id" : 42,
+    "visible" : 0,
+    "cloth" : 4
+  	},
+  	{
+  	"id" : 43,
+    "visible" : 2,
+    "preset" : 0,
+    "comment": 10
+  	},
+  	{
+  	"id" : 44,
+  	"visible" : 1,
+  	"ptz" : 0,
+  	"cam" : 2,
+  	"shader" : 1
+    },
+    {
+  	"id" : 45,
+  	"ptz" : 3
+    },
+    {
+  	"id" : 46,
+    "visible" : 0,
+    "cloth" : 2
+  	},
+  	{
+  	"id" : 47,
+  	"visible" : 1,
+  	"preset" : 1,
+  	"shader" : 1
+    },
+    {
+  	"id" : 48,
+    "visible" : 3
+    },
+    {
+  	"id" : 49,
+  	"preset" : 0,
+    "osd" : 3
+    },
+     {
+  	"id" : 50,
+    "visible" : 2,
+    "comment": 11
+  	},
+  	{
+  	"id" : 51,
+    "visible" : 0,
+    "cloth" : 4
+  	},
+  	{
+  	"id": 52,
+  	"visible" : 1,
+  	"cam" : 3,
+  	"shader": 1
+  	},
+  	{
+  	"id" : 53,
+    "visible" : 0,
+    "cloth" : 3
+  	},
+	{
+  	"id" : 54,
+  	"visible" : 1,
+  	"preset" : 1,
+  	"shader" : 1
+    },
+    {
+  	"id" : 55,
+    "visible" : 0,
+    "cloth" : 4
+    },
+    {
+  	"id" : 56,
+    "visible" : 0,
+    "cloth" : 0
+    }
+]

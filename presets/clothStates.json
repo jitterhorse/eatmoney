@@ -1,0 +1,32 @@
+[
+	{
+	  "stateId": 1,
+	  "damping": 0.666,
+	  "generalState": 0.1
+	},
+	{
+	  "stateId": 2,
+	  "damping": 0.766,
+	  "generalState": 0.2
+	},
+	{
+	  "stateId": 3,
+	  "damping": 0.866,
+	  "generalState": 0.5
+	},
+	{
+	  "stateId": 4,
+	  "damping": 0.996,
+	  "generalState": 0.7
+	},
+	{
+	  "stateId": 5,
+	  "damping": 0.9999999,
+	  "generalState": 0.9
+	},
+	{
+	  "stateId": 6,
+	  "damping": 0.6999999,
+	  "generalState": 1.
+	}
+]

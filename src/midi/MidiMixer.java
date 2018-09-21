@@ -13,9 +13,9 @@ public class MidiMixer {
 	
 	
 	
-	public void switchCh(int ch, int _layer){
+	public void switchCh(int ch){
 		  int channel = 0;
-		  int layer = 12 + _layer;
+		  int layer = 13;
 		  myBusOut.sendControllerChange(channel, layer, ch);      
 	  }
 	 

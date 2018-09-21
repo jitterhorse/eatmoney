@@ -192,20 +192,12 @@ public class UDPClient
 	   
 	   if(inout.equals("in")) {
 		   zoomspeed = (int)((1.-((float)zoomstate/(float)778))*(zoomin.length-1));
-		   if(gp.speedCam == true) {
-			   zoomspeed *= 2;
-			   if(zoomspeed >= zoomin.length) zoomspeed = zoomin.length-1;
-		   }
 		   sendData = new byte[] {(byte)0x04,(byte)0x07,zoomin[zoomspeed],(byte)0xFF};
 		   isZoomIn = true;
 		   isZoomOut = false;
 	   }
 	   else if(inout.equals("out")) {
 		   zoomspeed = (int)((1.-((float)zoomstate/(float)778))*(zoomout.length-1));
-		   if(gp.speedCam == true) {
-			   zoomspeed *= 2;
-			   if(zoomspeed >= zoomout.length) zoomspeed = zoomout.length-1;
-		   }
 		   sendData = new byte[] {(byte)0x04,(byte)0x07,zoomout[zoomspeed],(byte)0xFF};
 		   isZoomOut = true;
 		   isZoomIn = false;
@@ -301,7 +293,7 @@ public class UDPClient
 	   
    }
    
-   public void moveNew(float leftright,float updown) {
+   public void moveNew(float leftright,float updown,int mode) {
 	   boolean moveLR = false;
 	   boolean moveUD = false;
 	   byte[] sendData = {};
@@ -323,14 +315,14 @@ public class UDPClient
 		   byte ud = (byte)0x01; //up
 		   if(updown > 0) ud = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
-		   if(gp.speedCam == true) speednew *= 2;
+		   if(mode == 1) speednew = 4;
 		   byte udspeed = speed[speednew];
 		   
 		   //create leftright byte
 		   byte lr = (byte)0x01; //left
 		   if(leftright > 0) lr = (byte)0x02;
+	
 		   byte lrspeed = speed[speednew];
-		   
 		   sendData = new byte[] {(byte)0x06,(byte)0x01,lrspeed,udspeed,lr,ud,(byte)0xFF};
 		   ismovingLR = true;
 		   ismovingUD = true;
@@ -339,7 +331,7 @@ public class UDPClient
 		   byte lr = (byte)0x01; //left
 		   if(leftright > 0) lr = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
-		   if(gp.speedCam == true) speednew *= 2;
+		   if(mode == 1) speednew = 4;
 		   byte lrspeed = speed[speednew];
 		   
 		   sendData = new byte[] {(byte)0x06,(byte)0x01,lrspeed,(byte)0x01,lr,(byte)0x03,(byte)0xFF};
@@ -352,16 +344,15 @@ public class UDPClient
 		   byte ud = (byte)0x01; //up
 		   if(updown > 0) ud = (byte)0x02;
 		   int speednew = (int)((1.-((float)zoomstate/(float)778))*(speed.length-10));
-		   if(gp.speedCam == true) speednew *= 2;
+		   if(mode == 1) speednew = 4;
 		   byte udspeed = speed[speednew];
-		   
 		   sendData = new byte[] {(byte)0x06,(byte)0x01,(byte)0x01,udspeed,(byte)0x03,ud,(byte)0xFF};
 		   ismovingUD = true;
 		   ismovingLR = false;
 	   }
 	   else if (moveLR == false && moveUD == false) {
 		   this.stop();
-		   
+		   gp.currHandle = 0;
 		   }
 
 	   try {
