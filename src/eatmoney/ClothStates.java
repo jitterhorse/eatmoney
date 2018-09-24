@@ -22,7 +22,7 @@ public class ClothStates {
 		JSONArray savedData = emm.loadJSONArray("presets//clothStates.json");
 		for (int i = 0; i < savedData.size(); i++) {
 			JSONObject state = savedData.getJSONObject(i);
-			CState s = new CState(state.getInt("stateId"),state.getFloat("damping"),state.getFloat("generalState"));
+			CState s = new CState(state.getInt("stateId"),state.getFloat("damping"),state.getFloat("generalState"),state.getFloat("shakeH"));
 			allCStates.add(s);
 		}
 	}
@@ -34,6 +34,7 @@ public class ClothStates {
 		emm.co.param_cloth_particle.DAMP_VELOCITY = allCStates.get(id).damping;
 		emm.cont.damping.setValue(allCStates.get(id).damping*10000.f);
 		emm.cont.damping.update();
+		emm.co.shakeH = allCStates.get(id).shakeH;
 	}
 	
 	class CState{
@@ -41,11 +42,13 @@ public class ClothStates {
 		int id;
 		float damping;
 		float genState;
+		float shakeH;
 		
-		public CState(int _id,float _damping, float _genState) {
+		public CState(int _id,float _damping, float _genState, float _shakeH) {
 			id = _id;
 			damping = _damping;
 			genState = _genState;
+			shakeH = _shakeH;
 		}
 		
 	}

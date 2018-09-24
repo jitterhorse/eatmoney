@@ -1,16 +1,11 @@
-0-An Leuten wie mir ist das System gescheitert? Wir waren doch alle dafÃ¼r.
-1-WofÃ¼r? KrankenhÃ¤user schlieÃŸen? Hat mich keiner gefragt.
-1-So ist das, mit Notstandsverordnungen
-2-Erst produzieren wir Not, die Verordnung kommt dann frei Haus.
-0-Nu redet doch mal zur Sache, das ist doch hier kein Spiel!Â  Da sitzen zwei, die dabei waren. Warum habt ihr keine Fragen an die?
+0-An Leuten wie mir ist das System gescheitert? Wir waren doch alle dafür.
+1-Wofür? Krankenhäuser schließen? Hat mich keiner gefragt.
+0-Nu redet doch mal zur Sache, das ist doch hier kein Spiel!  Da sitzen zwei, die dabei waren. Warum habt ihr keine Fragen an die?
 1-Weil wir Hunger haben
-1-Weil es kalt ist
 1-Weil ich ein Update brauch
 1-Weil es nicht regnet
-1-Weil nichts wÃ¤chst
-1-Aber wer keine Fragen mehr hat, der ist schon tot.
+1-Wer keine Fragen mehr hat, der ist schon tot.
 2-Dann frag doch
-0-Ich will nicht wissen, warum sie das gemacht haben. Wer will das noch hÃ¶ren? Jetzt ist am Arsch, jetzt geht es doch darum, ob es weiter geht und wie! Und das will ich von denen hÃ¶ren, die uns den Scheiss eingebrockt haben. Dass es weiter geht, und wie!
-1-Du willst, dass die dich retten, die das hier angezettelt haben?
-1-Ich will wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt. Um die Geschichte sollen sich andere kÃ¼mmern, ich will auf die Insel.Â 
-2-Du bist wirklich am Arsch, Alter. TrÃ¤um weiter.
+0-Ich will nicht wissen, warum sie das gemacht haben. Wie geht es weiter, will ich wissen. Und das will ich von denen hören, die uns den Scheiss eingebrockt haben.
+0-Ich will wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt.
+1-Du? Auf ne Insel? Du bist wirklich am Arsch, Alter. Träum weiter.

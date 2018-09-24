@@ -59,7 +59,7 @@ class commentObject{
     try {
         
         InputStream inputStream       = new FileInputStream(parent.sketchPath() +"\\comments\\comments_"+ file +".txt");
-        Reader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        Reader inputStreamReader = new InputStreamReader(inputStream, "Cp1252");
         br = new BufferedReader(inputStreamReader);
         String line = br.readLine();
 

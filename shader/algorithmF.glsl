@@ -5,9 +5,12 @@ precision mediump int;
 
 uniform sampler2D vidtexture;
 uniform sampler2D tracktexture;
+uniform sampler2D irisTex;
 
 uniform vec2 iResolution;
 uniform int status;
+uniform float trackingTimer;
+uniform int showIris;
 
 varying vec4 vertColor;
 varying vec4 vertTexCoord;
@@ -172,16 +175,19 @@ void main()
         
     // Output to screen
     if(status==0){
-    gl_FragColor = col + col2 + col3 + col5 + col6;
-    gl_FragColor += texture2D(tracktexture,vec2(vertTexCoord.s,1.-vertTexCoord.t));
+    	gl_FragColor = col + col2 + col3 + col5 + col6;
+	    if(trackingTimer < 1.){
+	    	 gl_FragColor += texture2D(tracktexture,vec2(vertTexCoord.s,1.-vertTexCoord.t));
+	    }
+	    if(showIris == 1){
+	    	float sx = 1280.0/250.0;
+	    	float aspect = 1280.0 / 720.0;
+	    	vec4 irC = texture2D(irisTex,vec2(-4.,-0.6) + vec2((vertTexCoord.s*sx),(vertTexCoord.t*(sx / aspect))));
+	    	if(irC.a != 0) gl_FragColor = vec4(0,0,0,1) + irC;
+	    }
     }
     else if(status==1){
-    gl_FragColor = texture(vidtexture,uv);
-    }
-    else if(status ==2){
-    vec4 vi = texture(vidtexture,uv);
-    float bw = vi.r + vi.g + vi.b / 3.;
-    gl_FragColor = vec4(bw,bw,bw,1.);
+    	gl_FragColor = texture(vidtexture,uv);
     }
     
 }

@@ -14,7 +14,7 @@ public class LightRig {
 	float multi = 1.f;
 	float direction = -1.f;
 	float speed = 0.05f;
-	float changespeed = 0.02f;
+	float changespeed = 0.01f;
 	
 	LightCol PL = new LightCol(255,255,255,255,-1000, -1000, -100);
 	LightCol AL = new LightCol(96,96,96,255);

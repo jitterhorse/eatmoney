@@ -200,7 +200,7 @@ public class ButlerObject {
 			 }
 
 			  butlerMean.x = parent.lerp(butlerMin.x,butlerMax.x, 0.5f);
-			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.15f);
+			  butlerMean.y = parent.lerp(butlerMin.y,butlerMax.y, 0.18f);
 			  butlerMean.z = parent.lerp(butlerMin.z,butlerMax.z, 0.5f);
 		}
 		

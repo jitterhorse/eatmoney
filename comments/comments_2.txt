@@ -1,5 +1,4 @@
-0-Mit BUTLER 3 fings an.Â 
-1-Ab da wurde es eigentlich immer schlimmer.Â 
-0-Ich war froh, als ich da raus war.Â 
-0-Abwarten. Wenn die KI ihr coming out hat,Â hÃ¶rt die auch auf zu arbeiten,Â dann dÃ¼rfen wir wieder ranâ€¦Â 
-1-DÃ¼rfen oder mÃ¼ssen?
+0-Mit BUTLER 3 fings an, aber ich war froh, als ich da raus war.
+0-Wenn die Künstlichen Intelligenz ihr coming out hat, hört die auch auf zu arbeiten,dann dürfen wir wieder ran…
+1-Dürfen oder müssen?
+2-Wir dürfen arbeiten und müssen dabei lächeln. 

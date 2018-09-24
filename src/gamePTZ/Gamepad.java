@@ -38,6 +38,8 @@ public class Gamepad{
 	boolean changepreset = false;
 	boolean firepreset = false;
 	 
+	boolean irisScan = false;
+	
 	int currHandle = 0;
 	 
 	//slider 0 & 1 is camera leftright & camera updown
@@ -159,6 +161,15 @@ public class Gamepad{
 		}
 		else if(buttonValues[7] == false && firepreset == true) {
 			firepreset = false;
+		}
+		// fire irisScan with pad
+		if(buttonValues[5] == true && irisScan == false && emm.vo.vb.shootIris == false) {
+			emm.vo.iris.reset();
+			irisScan = true;
+			emm.vo.vb.shootIris = true;
+		}
+		else if(buttonValues[5] == false && irisScan == true) {
+			irisScan = false;
 		}
 		
 	}

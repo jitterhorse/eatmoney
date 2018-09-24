@@ -53,8 +53,9 @@ public class Presets {
 	//3=butler
 	
 	//shader values
-	//0=mit FX
-	//1=ohne FX
+	//0=ohne FX
+	//1=mit FX
+	//2=mitFX + iris
 	
 	//cam values
 	//0=cam1 - ücam1
@@ -65,6 +66,8 @@ public class Presets {
 	//preset values
 	//0 - pr 1
 	//1 - pr 2 (split screen)
+	
+
 
 	//comments starting with 1 refering to filenames
 
@@ -102,6 +105,7 @@ public class Presets {
 	
 	public void loadPreset(int num) {
 		Preset p = allPresets.get(num);
+		 
 		int command = 0;
 		for(Change c : p.changes) {
 				if(c.target.equals("cloth")) {
@@ -112,6 +116,10 @@ public class Presets {
 				}
 				else if(c.target.equals("shader")) {
 					command = c.value;
+				}
+				else if(c.target.equals("tracking")) {
+					if(c.value == 0) emm.fm.detection = false;
+					else if(c.value == 1) emm.fm.detection = true;
 				}
 				else if(c.target.equals("preset")) {
 					emm.mm.switchPreset(c.value);
@@ -124,7 +132,15 @@ public class Presets {
 				}
 				else if(c.target.equals("ptz")) {
 					emm.GP.udp.recallPreset(c.value);
-				}				
+				}
+				else if(c.target.equals("iris")){
+					emm.vo.person = c.value;
+				}
+				else if(c.target.equals("main")) {
+					if(c.value == 0) emm.fade(false);
+					else if (c.value == 1) emm.fade(true);
+					emm.cont.fade.setValue(c.value);
+				}
 			}
 		
 		if(p.target == Target.cam) {

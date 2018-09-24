@@ -1,11 +1,11 @@
-0-Gewerkschaften für Cyborgs
-1-Hör endlich mit dem Scheiss auf. Wir brauchen keine Gewerkschaften. Wir sind vernetzt. 
-0-Wir zappeln im Netz und ihr merkt es nicht mal. 
-1-Ohne das Netz wären wir schon alle ertrunken. 
-1-Die meisten sind ertrunken. Und die, die Überleben, zappeln. Was soll das für ein Leben sein?
-2-Wo Leben ist, ist Hoffnung. 
-2-Ein Poet - und das in dieser Zeit! Was macht die Kunst? 
-2-Ging schon besser, aber ich will nicht klagen. Seit Monaten kein Update. Das Zittern ist zurück. Aber geht ja vielen so. 
-2-Tut mir leid, dass zu hören, Poet.  Aber du hast Recht, wo Leben ist, ist Hoffnung. Halt durch! Vielleicht können die uns ja helfen, wenn sie mit ihrem Prozess durch sind.
-2-Wenn die uns überhaupt helfen wollen. 
-2-Klar wolln die das. Wenn die das können, werden die das auch tun.
+0-Gewerkschaften f�r Cyborgs
+1-Wir brauchen keine Gewerkschaften. Wir sind vernetzt. 
+2-Wir zappeln im Netz und ihr merkt es nicht mal. 
+2-Ohne das Netz w�ren wir schon alle ertrunken. 
+3-Die meisten sind ertrunken.
+0-Wo Leben ist, ist Hoffnung. 
+1-Ein Poet - und das in dieser Zeit! Was macht die Kunst? 
+2-Ging schon besser, aber ich will nicht klagen. Seit Monaten kein Update. Das Zittern ist zur�ck. Aber geht ja vielen so. 
+3-Tut mir leid. Halt durch, Poet.  Vielleicht k�nnen die uns ja helfen, wenn sie mit ihrem Prozess durch sind.
+3-Wenn die uns �berhaupt helfen wollen. 
+3-Klar wolln die das. Wenn die das k�nnen, werden die das auch tun.

@@ -40,6 +40,7 @@ public class eatMoneyController {
 	
 	RadioButton r1, r2;
 	Button save;
+	public Button fade;
 	
 	Button[] presetButtons;
 	
@@ -303,7 +304,7 @@ public class eatMoneyController {
 	     .setGroup(interaction)
 	     ;	
 		
-		cp.addButton("fade")
+		fade = cp.addButton("fade")
 	     .setValue(1)
 	     .setPosition(120,290)
 	     .setSize(100,30)
@@ -525,8 +526,7 @@ public class eatMoneyController {
 		    }
 		    else if(theEvent.getController().getName().startsWith("preset_")){
 		    	String s = theEvent.getController().getName();
-		    	s = s.substring(7,8);
-		    	//em.presets.loadPreset(Integer.parseInt(s));
+		    	s = s.substring(7, s.length());
 		    	firePresetMouse(Integer.parseInt(s));
 		    }
 

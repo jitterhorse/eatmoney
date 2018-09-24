@@ -72,7 +72,9 @@ public class ClothObject {
 	  PVector camCenter = new PVector(0,0,0);
 	  
 	  float easing = 1.f;
-	  public float textureAlpha = 0.f;
+	  public float textureAlpha = 1.f;
+	  
+	  float shakeH = 10.f;
 	  
 	  public enum clothCenter{
 		  cloth,pin,emit,comment;
@@ -219,8 +221,12 @@ public class ClothObject {
 			  DISPLAY_GRID = !DISPLAY_GRID;
 		  }	
 		  
-		  if(Math.random() > 0.8 && parentc.generalState > 0.45) {
+		  if(Math.random() > 0.9 && parentc.generalState > 0.45) {
 			  cc = clothCenter.random();
+			  if(cc == clothCenter.pin &&  currentHandles.size() == 0 || currentHandles == null) cc = clothCenter.cloth;
+			  else if(cc == clothCenter.comment &&  currentComments.size() == 0 || currentComments == null) cc = clothCenter.cloth;
+			  else if(cc == clothCenter.emit &&  currentExposes.size() == 0 || currentExposes == null) cc = clothCenter.cloth;
+			  
 		  }
 		  if(Math.random() > 0.9 && parentc.generalState > 0.65) {
 			  textureAlpha = parentc.abs(textureAlpha - 1.f);
@@ -240,7 +246,7 @@ public class ClothObject {
 		  TB.currentBadges = new ArrayList<textB>();
 		  DISPLAY_MESH           = true;
 		  DISPLAY_GRID 		     = false;
-		  textureAlpha = 0.f;
+		  textureAlpha = 1.f;
 	  }
 	  
 	  
@@ -293,9 +299,9 @@ public class ClothObject {
 					   DataPacket d = new DataPacket(t);
 					   currentHandles.add(d);
 					   
-					   float[] new3 = {	(float) (particles[t].cx * (1.f + (Math.random() * 10.f - 5f))),
-							   			(float) (particles[t].cy * (1.f + (Math.random() * 10.f - 5f))),
-							   			(float) (particles[t].cz * (1.f + (Math.random()*10.f - 5f))),
+					   float[] new3 = {	(float) (particles[t].cx * (1.f + (Math.random() * shakeH - (shakeH/2.)))),
+							   			(float) (particles[t].cy * (1.f + (Math.random() * shakeH - (shakeH/2.)))),
+							   			(float) (particles[t].cz * (1.f + (Math.random()*  shakeH - (shakeH/2.)))),
 							   			1};
 					   
 					   particles[t].moveTo(new3, 0.1f);	   
@@ -399,7 +405,7 @@ public class ClothObject {
 				
 				data.set("maxCount",(float)dp.maxcount);
 				data.set("sizeDis", dp.size);
-				data.set("speed", dp.speed);
+				data.set("speed", dp.speed*0.2f);
 				
 				target.shader(data);
 				

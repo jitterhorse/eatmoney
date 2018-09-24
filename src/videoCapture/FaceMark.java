@@ -14,6 +14,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Point2f;
 import org.bytedeco.javacpp.opencv_core.Point2fVector;
 import org.bytedeco.javacpp.opencv_core.Point2fVectorVector;
+import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.RectVector;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
@@ -230,24 +231,47 @@ public class FaceMark implements Runnable{
 
 		@Override
 		public void run() {
-			System.out.println("fm started");
-			while(true) {
-				if(detection == true && cap != null) {
-					detect();
-				}
-				else if(detection == false) {
-					 if(landmarks.size() != 0) landmarks = new Point2fVectorVector();
-					 if(faceVector.size() != 0) faceVector = new RectVector();
-					 if(eyeVector.size() != 0) eyeVector = new RectVector();
-					 if(bodyVector.size() != 0) bodyVector = new RectVector();
-					 if(handVector.size() != 0) handVector = new RectVector();
-					
-					
+			synchronized(emm) {
+				while(true) {
+					if(detection == true && cap != null) {
+						detect();
+					}
+					else if(detection == false) {
+						 if(landmarks.size() != 0) landmarks = new Point2fVectorVector();
+						 if(faceVector.size() != 0) faceVector = new RectVector();
+						 if(eyeVector.size() != 0) eyeVector = new RectVector();
+						 if(bodyVector.size() != 0) bodyVector = new RectVector();
+						 if(handVector.size() != 0) handVector = new RectVector();
+						
+						
+					}
 				}
 			}
-			
 		}
 
+		public synchronized Rect getFaceV(long i) {
+			Rect r1 = new Rect();
+			try {
+				r1 = faceVector.get(i);
+			}
+			catch(RuntimeException ex){
+				System.out.println("ex1");
+			}
+			
+			return r1;
+		}
+
+		public synchronized Rect getEyeV(long i) {
+			Rect r1 = new Rect();
+			try {
+				r1 = eyeVector.get(i);
+			}
+			catch(RuntimeException ex){
+				System.out.println("ex2");
+			}
+			
+			return r1;
+		}		
 
 }
 	

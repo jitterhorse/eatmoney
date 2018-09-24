@@ -2,6 +2,7 @@ package eatmoney;
 
 import enums.ObjectMode;
 import enums.mode;
+import irisScans.Iris;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PMatrix3D;
@@ -13,34 +14,49 @@ import processing.opengl.PShader;
 public class VideoObject {
 
 	eatMoneyMain parent;
-	PShader vidTex,vidTex2;	
-	VideoBlob vb;
+	PShader vidTex2;	
+	public VideoBlob vb;
 	PShape videoPlane;
 	ObjectMode displaymode = ObjectMode.off;
-	float easing = 1.f;
-	  
-	  class VideoBlob{
+	float easing = 0.f;
+	public Iris iris;
+	public int person = 0;
+
+	  public class VideoBlob{
 
 		  int id;
 		  PVector position;
 		  boolean visible = true;
 		  float lifetime = 0.f;
 		  boolean impact = false;
+		  float trackingtime = 0.f;
 		  boolean close = false;
 		  int shader = 0;
+		  boolean iris = false;
+		  public boolean shootIris = false;
 		  
 		  public VideoBlob(int nodecount,int _shader) {
 			  id = (int) Math.floor(Math.random() * (nodecount));
 			  position = new PVector((float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500);
-			  shader = _shader;
+			  if(_shader == 2) {
+				  shader = 0;
+				  iris = true;
+			  }
+			  else if(_shader == 0) {
+				  trackingtime = 1.f;
+				  shader = _shader;
+			  }
+			  else if (_shader == 1){
+				  shader = _shader;
+			  }
 		  }
 		  
 	  }
 	  
 	public VideoObject(eatMoneyMain _emm) {
 		  parent = _emm;
+		  iris = new Iris(parent,400);
 		  createVidPlane();
-		  //vidTex = parent.loadShader("shader\\bloodyF2.glsl","shader\\bloodyV.glsl");
 		  vidTex2 = parent.loadShader("shader\\algorithmF.glsl","shader\\bloodyV.glsl");
 	}
 	
@@ -50,42 +66,53 @@ public class VideoObject {
 	public void drawVideo(PGraphics target) {
 		//draw Video Point
 	    if(vb != null && vb.visible == true) {
+	    	int iri = 0;
 	    	target.pushMatrix();
 		    PVector pos = new PVector(parent.co.particles[vb.id].cx,parent.co.particles[vb.id].cy,parent.co.particles[vb.id].cz);
-		    target.strokeWeight(1);
+		    target.strokeWeight(3);
 		    target.stroke(128,255);
-		    target.line(pos.x,pos.y,pos.z,vb.position.x,vb.position.y,vb.position.z);  
-
-			
+		    target.line(pos.x,pos.y,pos.z,parent.lerp(pos.x, vb.position.x, easing),parent.lerp(pos.y, vb.position.y, easing),parent.lerp(pos.y, vb.position.y, easing));  
 			if(parent.vidC.dotracking == true) {
 				target.endDraw();
 				parent.vidC.drawTrackings();
 				target.beginDraw();
 			}
-
+			
+			if(vb.iris == true && vb.shootIris == true) {
+				target.endDraw();
+				iris.draw(person);
+				iri = 1;
+				target.beginDraw();
+			}
+			
+			if(iris.getStatus(person)==true) {
+				vb.trackingtime = 1.f;
+			}
+			
+			//System.out.println("status: " + iri +  "/" + vb.iris + "/" + shootIris);
+			
 			PMatrix3D mat = ((PGraphics3D)target).cameraInv;
-		    mat.m03 = vb.position.x;
-		    mat.m13 = vb.position.y;
-		    mat.m23 = vb.position.z;
+		    mat.m03 = parent.lerp(pos.x, vb.position.x, easing);
+		    mat.m13 = parent.lerp(pos.y, vb.position.y, easing);
+		    mat.m23 = parent.lerp(pos.z, vb.position.z, easing);
 
 			float scale = 800.f;
-			float rotate = 0.f;
-			
+			float rotate = 0.f;	
 			mat.m00 += rotate *vb.lifetime;
-			target.applyMatrix(mat);
-			
-			
+			target.applyMatrix(mat);			
 			target.scale(vb.lifetime*scale, vb.lifetime * scale,1.f);
 			
 		    vidTex2.set("status",vb.shader);		
 		    vidTex2.set("vidtexture", parent.vidC.getCameraImage());
 		    vidTex2.set("tracktexture", parent.vidC.getTrackingImage());
+		    vidTex2.set("trackingTimer", vb.trackingtime);
+		    vidTex2.set("irisTex", iris.getIrisImage());
+		    vidTex2.set("showIris", iri);
+		    
 		    target.shader(vidTex2);
-   
-		    target.shape(videoPlane);
-		    
+		    target.shape(videoPlane);	    
 		    target.resetShader();
-		    
+	
 		    target.popMatrix();
 	    }
 	}

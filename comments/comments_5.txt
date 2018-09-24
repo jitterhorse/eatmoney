@@ -1,11 +1,8 @@
 0-Ist das eigentlich gescripted oder sind die echt?
-0-Vorabend
-0-Keine Ahnung, was das heiÃŸen soll. Aber die sind echt. Yldune und Onz sind Aktivisten aus den 10er und 20er Jahren, die sich radikalisiert haben, als der Nano-Tremor aufkam und die Stiftung das Grundeinkommen eingefÃ¼hrt hat.
-1-Danke, Herr Lehrer
-2-Warum Herr?Â 
-0-Will hier mal jemand zur Sache reden? Wir sollen am Ende entscheiden, ob die Leben oder Sterben. Das muss man ernst nehmen?
-1-Im Ernst? Ich soll das ernst nehmen?Â 
-0-Ihr meint, das ist echt? Die schieÃŸen am Ende wirklich jemanden tot?Â 
-1-Nicht jemanden, sondern die Angeklagtenâ€¦Â 
-0-Trotzdem, ich finde das irgendwie nicht richtig
-1-Heul dochÂ 
+1-Klar sind die echt. Yldune und Onz sind Aktivisten aus den 10er Jahren, die sich radikalisiert haben, als der Nano-Tremor aufkam und die Stiftung das Grundeinkommen eingeführt hat.
+1-Will hier mal jemand zur Sache reden? Wir sollen am Ende entscheiden, ob die Leben oder Sterben. Das muss man ernst nehmen.
+2-Im Ernst? Ich soll das ernst nehmen? 
+0-Ihr meint, das ist echt? Die schießen am Ende wirklich jemanden tot? 
+1-Nicht jemanden, sondern die Angeklagten… 
+2-Trotzdem, ich finde das irgendwie nicht richtig
+3-Heul doch  

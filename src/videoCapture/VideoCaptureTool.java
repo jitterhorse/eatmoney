@@ -59,7 +59,7 @@ public class VideoCaptureTool {
 	    if(trackingFace == true) {	
 	    	for (long i = 0; i < emm.fm.faceVector.size(); i++) {
 	    	trackingTex.pushMatrix();
-    		Rect r = emm.fm.faceVector.get(i);
+    		Rect r = emm.fm.getFaceV(i);
     		trackingTex.fill(255,50);
     		trackingTex.stroke(0,255,0,255);
     		trackingTex.strokeWeight(2);
@@ -71,7 +71,7 @@ public class VideoCaptureTool {
 	    if(trackingEyes == true) {   
 	       	for (long i = 0; i < emm.fm.eyeVector.size(); i++) {
 		    	trackingTex.pushMatrix();
-	    		Rect r = emm.fm.eyeVector.get(i);
+	    		Rect r = emm.fm.getEyeV(i);
 	    		trackingTex.fill(255,50);
 	    		trackingTex.stroke(0,255,0,255);
 	    		trackingTex.strokeWeight(2);

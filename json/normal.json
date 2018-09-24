@@ -1,42 +1,42 @@
 [[
   {
-    "posx": 4,
-    "posy": 14,
+    "posx": 27,
+    "posy": 4,
     "col": 255
   },
   {
-    "posx": 403,
+    "posx": 416,
     "posy": -74,
     "col": 254
   },
   {
     "posx": 853,
-    "posy": -68,
+    "posy": -57,
     "col": 253
   },
   {
-    "posx": 1254,
-    "posy": 17,
+    "posx": 1270,
+    "posy": 7,
     "col": 252
   },
   {
-    "posx": 5,
-    "posy": 719,
+    "posx": 1,
+    "posy": 700,
     "col": 251
   },
   {
-    "posx": 399,
-    "posy": 626,
+    "posx": 389,
+    "posy": 525,
     "col": 250
   },
   {
-    "posx": 871,
-    "posy": 624,
+    "posx": 852,
+    "posy": 520,
     "col": 249
   },
   {
-    "posx": 1242,
-    "posy": 704,
+    "posx": 1278,
+    "posy": 737,
     "col": 248
   }
 ]]

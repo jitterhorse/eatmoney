@@ -407,6 +407,7 @@ public class UDPClient
    }
  
    public void recallPreset(int number) {
+	   if(gp.emm.testing == true) number += 4;
 	   byte preset = presets[number];
 	   //81 01 04 3F 00 pp FF
 	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x3F,(byte)0x02,preset,(byte)0xFF};
