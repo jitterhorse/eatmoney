@@ -21,6 +21,7 @@ public class VideoObject {
 	float easing = 0.f;
 	public Iris iris;
 	public int person = 0;
+	User usercount;
 
 	  public class VideoBlob{
 
@@ -29,18 +30,21 @@ public class VideoObject {
 		  boolean visible = true;
 		  float lifetime = 0.f;
 		  boolean impact = false;
-		  float trackingtime = 0.f;
+		  public float trackingtime = 0.f;
 		  boolean close = false;
 		  int shader = 0;
 		  boolean iris = false;
 		  public boolean shootIris = false;
+		  public boolean showUser = false;
 		  
 		  public VideoBlob(int nodecount,int _shader) {
 			  id = (int) Math.floor(Math.random() * (nodecount));
 			  position = new PVector((float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500,(float)(Math.random()*1000.)-500);
 			  if(_shader == 2) {
 				  shader = 0;
+				  trackingtime = 0.f;
 				  iris = true;
+				 
 			  }
 			  else if(_shader == 0) {
 				  trackingtime = 1.f;
@@ -48,6 +52,10 @@ public class VideoObject {
 			  }
 			  else if (_shader == 1){
 				  shader = _shader;
+			  }
+			  else if(_shader == 3) {
+				  shader = 1;
+				  showUser = true;
 			  }
 		  }
 		  
@@ -58,6 +66,7 @@ public class VideoObject {
 		  iris = new Iris(parent,400);
 		  createVidPlane();
 		  vidTex2 = parent.loadShader("shader\\algorithmF.glsl","shader\\bloodyV.glsl");
+		  usercount = new User(this);
 	}
 	
 	
@@ -85,18 +94,26 @@ public class VideoObject {
 				target.beginDraw();
 			}
 			
+			
+			
 			if(iris.getStatus(person)==true) {
 				vb.trackingtime = 1.f;
 			}
 			
-			//System.out.println("status: " + iri +  "/" + vb.iris + "/" + shootIris);
+			
+		    if(vb.showUser == true) {
+		    	target.endDraw();
+		    	usercount.drawUser();
+		    	target.beginDraw();
+		    }
+		    
 			
 			PMatrix3D mat = ((PGraphics3D)target).cameraInv;
 		    mat.m03 = parent.lerp(pos.x, vb.position.x, easing);
 		    mat.m13 = parent.lerp(pos.y, vb.position.y, easing);
 		    mat.m23 = parent.lerp(pos.z, vb.position.z, easing);
 
-			float scale = 800.f;
+			float scale = 850.f;
 			float rotate = 0.f;	
 			mat.m00 += rotate *vb.lifetime;
 			target.applyMatrix(mat);			
@@ -109,10 +126,17 @@ public class VideoObject {
 		    vidTex2.set("irisTex", iris.getIrisImage());
 		    vidTex2.set("showIris", iri);
 		    
+		    
+		    int su = (vb.showUser == true) ? 1 : 0;
+		    vidTex2.set("showUser", su);
+		    vidTex2.set("userTex",usercount.getUserImage());
+		    
+		    
 		    target.shader(vidTex2);
 		    target.shape(videoPlane);	    
 		    target.resetShader();
 	
+
 		    target.popMatrix();
 	    }
 	}
@@ -130,6 +154,9 @@ public class VideoObject {
 	public void newVideoBlob(int channel,int particlecount,int shader) {
 		//todo: swicth video channel automatically
 		vb = new VideoBlob(particlecount,shader);	
+		if(shader == 2) {
+			 iris.reset();
+		}
 	}
 	
 	public void closeVideoBlob() {

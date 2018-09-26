@@ -30,6 +30,9 @@ public class textBadges {
 	int cx = 10;
 	int cy = 10;
 	
+	float swopTime = 0.f;
+
+	
 	public textBadges(eatMoneyMain _main, ClothObject _co) {
 		  main = _main;
 		  co = _co;
@@ -47,6 +50,7 @@ public class textBadges {
 	}
 	
 	public void createBadge(int count) {
+		
 		currentBadges = new ArrayList<textB>();
 		int sizeCloth = co.nodecount * co.nodecount;
 		for(int i = 0; i < count; i++) {
@@ -62,26 +66,29 @@ public class textBadges {
 			for(textB t : currentBadges) {
 				target.pushMatrix();
 				//target.translate(co.particles[t.id].cx,co.particles[t.id].cy,co.particles[t.id].cz);
-				target.stroke(199,255);
+				target.stroke(199,255*t.easein);
 				target.strokeWeight(1);
 				target.line(co.particles[t.id].cx,co.particles[t.id].cy+(t.offset*0.1f),co.particles[t.id].cz,co.particles[t.id].cx,co.particles[t.id].cy+(t.offset),co.particles[t.id].cz);
 				textShader.set("inputText",t.textImg);
 				PVector siz = new PVector((float)t.maxleng,(float)t.lines,0.f);
 				textShader.set("count",siz); 
+				textShader.set("alpha", t.easein);
 				target.translate(co.particles[t.id].cx,co.particles[t.id].cy+(t.offset),co.particles[t.id].cz);
 				target.rotateY(PConstants.PI);
-			    /*
-				PMatrix3D mat = ((PGraphics3D)target).cameraInv;
-			    mat.m03 = co.particles[t.id].cx;
-			    mat.m13 = co.particles[t.id].cy+(t.offset);
-			    mat.m23 = co.particles[t.id].cz;
-
-			    target.applyMatrix(mat);
-				*/
 				target.shader(textShader);
 				target.shape(object);
 				target.resetShader();
 				target.popMatrix();
+				t.time -= 1.;
+				if(t.time > 100.) {
+					t.easein += 0.01f;
+				}
+				else if(t.time < 100.) {
+					t.easein -= 0.01f;
+				}
+				if(t.time <= 0.) {
+					t.reState();	
+				}
 			}
 		}
 	}
@@ -133,20 +140,27 @@ public class textBadges {
 		PGraphics textImg; 
 		int id = 0;
 		float offset;
-		String[] tagwords = {"nord-EU","EU","OC","oceancities","LTEM","LET_THEM_EAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU","HPP","CONNST","ROSSER","ROLOEG"};
-		
-		
+		String[] tagwords = {"nord-EU","EU","OC","oceancities","LTEM","LET_THEM_EAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU","HPP","CONNST","ROSSER","ROLOEG"};	
+		float time = 0.f;		
+		float easein = 0.f;
 		
 		public textB(eatMoneyMain _main,int _id) {
 			main = _main;
 			id = _id;
 			offset = (main.random(1.f) > 0.5f) ? -1.f : 1.f;
 			float wide = main.random(1300);
+			time = main.random((1.f-swopTime)*1000)+100;
 			offset *= wide;
 			createRandomText();
 			textToTexture();
 		}
 	
+		public void reState() {
+			this.id =  main.floor(main.random(co.nodecount * co.nodecount));
+			this.time = main.random((1.f-swopTime)*1000)+100;
+			this.easein = 0.f;
+		}
+
 		void createRandomText(){
 			   String s;
 			   Random rndm = new Random();

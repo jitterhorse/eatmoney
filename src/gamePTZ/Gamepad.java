@@ -163,10 +163,11 @@ public class Gamepad{
 			firepreset = false;
 		}
 		// fire irisScan with pad
-		if(buttonValues[5] == true && irisScan == false && emm.vo.vb.shootIris == false) {
-			emm.vo.iris.reset();
+		if(buttonValues[5] == true && irisScan == false && emm.vo.vb != null && emm.vo.vb.shootIris == false) {
+			
 			irisScan = true;
 			emm.vo.vb.shootIris = true;
+			//emm.vo.vb.trackingtime = 0.f;
 		}
 		else if(buttonValues[5] == false && irisScan == true) {
 			irisScan = false;

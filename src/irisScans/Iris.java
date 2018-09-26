@@ -51,6 +51,7 @@ public class Iris {
 	public void reset() {
 		iScans.get(0).resetIris();
 		iScans.get(1).resetIris();
+		emm.vo.vb.trackingtime = 0.f;
 	}
 
 	public boolean getStatus(int ir) {

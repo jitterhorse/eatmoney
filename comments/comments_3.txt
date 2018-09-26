@@ -1,9 +1,6 @@
-0-Im Ernst, Yldune. wer redet hier überhaupt. Du oder dein Implantat?
-1-Implantaten-Puppe
-0-Cyborgs unite!
-1-Cyberpunk rules
-1-Geh tanzen Opa
-0-Ab auf die Insel mit dir.
+0-Wer redet hier überhaupt, Yldune? Du oder dein Implantat?  
+1-Implantaten-Puppe, ab auf die Insel mit dir, vielleicht gibt's ja ein Update.  
+0-Ich find die Roloeg spannend. Aber was haben die mit ihr vor?  
 0-Stalin lässt grüßen
-1-Stalin rules
-1-Wer ist Stalin?
+1-Gibt's jetzt Gulag-Inseln? Für Cyborgs?  
+2-Wer ist Stalin und was ist ein Gulag?  

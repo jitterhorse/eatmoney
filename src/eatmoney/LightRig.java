@@ -13,7 +13,7 @@ public class LightRig {
 	boolean blackout = false;
 	float multi = 1.f;
 	float direction = -1.f;
-	float speed = 0.05f;
+	float speed = 0.025f;
 	float changespeed = 0.01f;
 	
 	LightCol PL = new LightCol(255,255,255,255,-1000, -1000, -100);
@@ -25,7 +25,7 @@ public class LightRig {
 	LightCol DLnew = new LightCol(210,210,210,255,-1, -1.5f, -2);
 	
 	public boolean PLset = true;
-	public boolean ALset = false;
+	public boolean ALset = true;
 	public boolean DLset = true;
 	
 	class LightCol {	
@@ -110,14 +110,14 @@ public class LightRig {
 		}
 		
 		if(Math.random() > 0.999) {
-			DL.r = (float) (Math.random() * 255);
-			DL.g = DL.r; DL.b = DL.r;
+			DLnew.r = (float) (Math.random() * 255);
+			DLnew.g = DLnew.r; DLnew.b = DLnew.r;
 			//DL.g = (float) (Math.random() * 255);
 			//DL.b = (float) (Math.random() * 255);
 		}
 		if(Math.random() > 0.999) {
-			AL.r = (float) (Math.random() * 255);
-			AL.g = AL.r * 0.9f; AL.b = AL.r * 0.9f;
+			ALnew.r = (float) (Math.random() * 155) + 100.f;
+			ALnew.g = ALnew.r * 0.9f; ALnew.b = ALnew.r * 0.9f;
 			//AL.g = (float) (Math.random() * 255);
 			//AL.b = (float) (Math.random() * 255);
 		}

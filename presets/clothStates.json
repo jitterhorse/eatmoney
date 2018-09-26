@@ -3,13 +3,13 @@
 	  "stateId": 1,
 	  "damping": 0.666,
 	  "generalState": 0.1,
-	  "shakeH" : 10
+	  "shakeH" : 0
 	},
 	{
 	  "stateId": 2,
-	  "damping": 0.766,
+	  "damping": 0.466,
 	  "generalState": 0.2,
-	  "shakeH" : 15.0
+	  "shakeH" : 10.0
 	},
 	{
 	  "stateId": 3,
@@ -19,20 +19,32 @@
 	},
 	{
 	  "stateId": 4,
-	  "damping": 0.996,
+	  "damping": 0.9296,
 	  "generalState": 0.7,
 	  "shakeH" : 15
 	},
 	{
 	  "stateId": 5,
-	  "damping": 0.9999999,
+	  "damping": 0.8999999,
 	  "generalState": 0.9,
 	  "shakeH" : 25
 	},
 	{
 	  "stateId": 6,
-	  "damping": 0.6999999,
+	  "damping": 0.61999999,
 	  "generalState": 1.,
-	  "shakeH" : 10
+	  "shakeH" : 0
+	},
+	{
+	  "stateId": 7,
+	  "damping": 0.600999999,
+	  "generalState": 0.21,
+	  "shakeH" : 5
+	},
+	{
+	  "stateId": 8,
+	  "damping": 0.21999999,
+	  "generalState": 0.1,
+	  "shakeH" : 0
 	}
 ]

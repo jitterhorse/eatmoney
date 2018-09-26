@@ -35,6 +35,7 @@ public class ClothStates {
 		emm.cont.damping.setValue(allCStates.get(id).damping*10000.f);
 		emm.cont.damping.update();
 		emm.co.shakeH = allCStates.get(id).shakeH;
+		emm.co.TB.swopTime = allCStates.get(id).genState;
 	}
 	
 	class CState{

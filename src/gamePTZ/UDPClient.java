@@ -40,6 +40,7 @@ public class UDPClient
 	   gp = _gp;
 	   getZoomState();
 	   autoFocus();
+	   setWB();
    }
    
    public void sendCommand(byte[] sendData) throws Exception{
@@ -386,6 +387,16 @@ public class UDPClient
 
    public void manualFocus() {
 	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x38,(byte)0x03,(byte)0xFF};
+	   try {
+			sendCommand(sendData);
+			//System.out.println("save preset");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+   }
+   
+   public void setWB() {
+	   byte[] sendData = new byte[] {(byte)0x04,(byte)0x35,(byte)0x02,(byte)0xFF};
 	   try {
 			sendCommand(sendData);
 			//System.out.println("save preset");

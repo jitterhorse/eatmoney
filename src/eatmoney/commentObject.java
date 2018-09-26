@@ -156,7 +156,7 @@ class commentObject{
 	      layer = _layer;
 	      len = _len;
 	      parent.textFont(f);
-	      parent.textSize(textSize);
+	      parent.textSize(textSize *1.05f);
 	      float tw = parent.textWidth(content);
 	      lines = parent.ceil(tw/(float)textWidth[layer]);
 	    }

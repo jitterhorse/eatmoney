@@ -21,13 +21,13 @@ void main(void) {
    
    vec2 newpos = vertTexCoord.xy + (dispcol.xy*offset.xy);
    
-   if( newpos.x > 1.) newpos.x =1.;
-   else if( newpos.x < 0.) newpos.x =0.;
-   if( newpos.y > 1.) newpos.y =1.;
-   else if( newpos.y < 0.) newpos.y =0.; 
+   if( newpos.x > 1.) newpos.x = 1.;
+   else if( newpos.x < 0.) newpos.x = 0.;
+   if( newpos.y > 1.) newpos.y = 1.;
+   else if( newpos.y < 0.) newpos.y = 0.; 
     
    vec4 col0 = texture2D(texture,newpos);
    
-   gl_FragColor = col0 * (1.+(dispcol.x + dispcol.y)) + dispcol * vec4(0.1,0.1,0.1,0.6);;
+   gl_FragColor = col0 * (1.+(dispcol.x + dispcol.y)) + dispcol * vec4(0.1,0.1,0.1,0.6);
 
 }

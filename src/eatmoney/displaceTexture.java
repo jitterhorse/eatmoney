@@ -42,12 +42,12 @@ public class displaceTexture {
 		  disp.clear();
 		  disp.textFont(f);
 		  disp.textAlign(PConstants.CENTER,PConstants.CENTER);
-		  disp.textSize(100);
+		  disp.textSize(40);
 		  disp.noStroke();
 		  float lt = lifetime;
 		  if(lifetime > 1.) lt = 1.f - (lifetime-1.f);
 		  float alp = easeInOut(lifetime,0.f,255.f,2.f);
-		  disp.fill(255,alp+0.00001f);
+		  disp.fill(255,alp);
 		  float pos = easeInOut(lifetime,-50.f,100.f,2.f);
 		  disp.text(contents[contentID], (float)disp.width/2.f, (float)disp.height/2.f + pos);
 		  disp.endDraw();

@@ -53,9 +53,10 @@ public class Presets {
 	//3=butler
 	
 	//shader values
-	//0=ohne FX
-	//1=mit FX
+	//0=mit FX
+	//1=ohne  FX
 	//2=mitFX + iris
+	//3=ohneFX mit UserCount
 	
 	//cam values
 	//0=cam1 - ücam1
@@ -67,6 +68,9 @@ public class Presets {
 	//0 - pr 1
 	//1 - pr 2 (split screen)
 	
+	//extra values
+	//iris (person)
+	//userCount (count)
 
 
 	//comments starting with 1 refering to filenames
@@ -116,6 +120,7 @@ public class Presets {
 				}
 				else if(c.target.equals("shader")) {
 					command = c.value;
+					if(emm.vo.vb != null) emm.vo.vb.shader = c.value;
 				}
 				else if(c.target.equals("tracking")) {
 					if(c.value == 0) emm.fm.detection = false;
@@ -133,13 +138,20 @@ public class Presets {
 				else if(c.target.equals("ptz")) {
 					emm.GP.udp.recallPreset(c.value);
 				}
+				else if(c.target.equals("userCount")) {
+					emm.vo.usercount.setUserCount(c.value);
+				}
+				
 				else if(c.target.equals("iris")){
 					emm.vo.person = c.value;
+				}
+				else if(c.target.equals("reset")){
+					emm.co.resetCloth();
 				}
 				else if(c.target.equals("main")) {
 					if(c.value == 0) emm.fade(false);
 					else if (c.value == 1) emm.fade(true);
-					emm.cont.fade.setValue(c.value);
+					//emm.cont.fade.setValue(c.value);
 				}
 			}
 		

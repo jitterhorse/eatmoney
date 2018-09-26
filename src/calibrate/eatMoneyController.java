@@ -305,7 +305,6 @@ public class eatMoneyController {
 	     ;	
 		
 		fade = cp.addButton("fade")
-	     .setValue(1)
 	     .setPosition(120,290)
 	     .setSize(100,30)
 	     .setGroup(interaction)
@@ -521,22 +520,20 @@ public class eatMoneyController {
 		    	em.lightRig.DLset = ! em.lightRig.DLset;
 		    }
 		    else if(theEvent.getController().getName().equals("fade")) {
-		    	em.fader = !em.fader;
-		    	
+		    	//System.out.println(theEvent.getValue());
+		    	if(em.fader == true) em.fade(false);
+		    	else if(em.fader == false) em.fade(true);
 		    }
 		    else if(theEvent.getController().getName().startsWith("preset_")){
 		    	String s = theEvent.getController().getName();
 		    	s = s.substring(7, s.length());
 		    	firePresetMouse(Integer.parseInt(s));
-		    }
-
-		    
+		    }   
 		    else if(theEvent.getController().getName().equals("close interaction")) {
 		    	interaction.setVisible(false);
 		    	presets.setVisible(false);
 		    	standard.setVisible(true);
 		    }		    
-		   
 		  }
 	  }
 	

@@ -13,6 +13,7 @@ class IrisScan{
 	  private String name;
 	  private int [][] vals;
 	  private float[] hei;
+	  boolean sounds[] = {false,false,false,false,false};
 	  int wid = 400;
 	  private int c = 0;
 	  private boolean text = false;
@@ -32,13 +33,22 @@ class IrisScan{
 	    for(int i = 0; i < irisLayers.size(); i++){
 	     hei[i] = 0;
 	     irisLayers.get(i).active = false;
-	     text = false;
+	     sounds[i] = false;
 	    }
+	    this.text = false;
 	    c = 0;
+	 
 	  }
 	  
 	  public void drawIris(PGraphics targ){
 		 	
+		 if(c < sounds.length && sounds[c] == false) {
+			 ip.emm.sendOsc(c+6);
+			 if(c == 0)  ip.emm.sendOsc(1+6);
+			 if(c == 4) ip.emm.sendOsc(3+6);
+			 sounds[c] = true;
+		 }
+		  
 		 for(int i = 0; i < hei.length;i++) {
 		    this.irisShader.set("h"+i, hei[i]);
 			this.irisShader.set("it"+i, irisLayers.get(i).getImage());
@@ -49,19 +59,19 @@ class IrisScan{
 		 targ.rect(0, 0, wid, wid);
 		 targ.resetShader();
 		
-	    if(text == false) {
+	    if(this.text == false) {
 		    if(hei[c] < 1. && irisLayers.get(c).active == false ) hei[c] += 0.03;
 	        else if(hei[c] >= 1. && irisLayers.get(c).active == false){
 	        	irisLayers.get(c).active = true;
 	        	c++;
-	        	if(c == vals.length) text = true;
+	        	if(c == vals.length) this.text = true;
 	        } 
 	    }
 	    
 	  }
 	  
 	  public boolean getStatus() {
-		  return text;
+		  return this.text;
 	  }
 	  
 	  

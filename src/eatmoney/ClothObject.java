@@ -193,42 +193,41 @@ public class ClothObject {
 	  }
 	  
 	  public void reState() {
-		  parentc.sendOsc(PApplet.floor((float) (Math.random()*4.)));
-		  if(Math.random() > 0.5 && parentc.generalState > 0.2) {
-			  shake();
+		  //parentc.sendOsc(PApplet.floor((float) (Math.random()*4.)));
+		  if(Math.random() > 0.7 && parentc.generalState > 0.45) {
+			  shake(); //wirble object
 		  }
 		  
-		  else if(Math.random() > 0.8 && parentc.generalState > 0.3) {	  
+		  else if(Math.random() > 0.8 && parentc.generalState > 0.2999) {	  
 			  reshake();
 		  }
 		  
-		  if(Math.random() > 0.5 && parentc.generalState > 0.5) {
-			  
-			  mark();
+		  if(Math.random() > 0.5 && parentc.generalState > 0.2299) {
+			  mark(); //textBadges
 		  }
 		  		  
-		  if(Math.random() > 0.5 && parentc.generalState > 0.1) {
-			  emit();
+		  if(Math.random() > 0.5 && parentc.generalState > 0.0999) {
+			  emit(); //rects
 		  }
-		  if(Math.random() > 0.5 && parentc.generalState > 0.7) {  
-			  badges();
+		  if(Math.random() > 0.3 && parentc.generalState > 0.1999) {  
+			  badges(); // lines
 		  }
 		  
-		  if(Math.random() > 0.5 && parentc.generalState > 0.25) {	  
+		  if(Math.random() > 0.75 && parentc.generalState > 0.15) {	  
 			  DISPLAY_MESH = !DISPLAY_MESH;
 		  }
-		  if(Math.random() > 0.5 && parentc.generalState > 0.35) {
+		  if(Math.random() > 0.75 && parentc.generalState > 0.15) {
 			  DISPLAY_GRID = !DISPLAY_GRID;
 		  }	
 		  
-		  if(Math.random() > 0.9 && parentc.generalState > 0.45) {
+		  if(Math.random() > 0.97 && parentc.generalState > 0.35) {
 			  cc = clothCenter.random();
 			  if(cc == clothCenter.pin &&  currentHandles.size() == 0 || currentHandles == null) cc = clothCenter.cloth;
 			  else if(cc == clothCenter.comment &&  currentComments.size() == 0 || currentComments == null) cc = clothCenter.cloth;
 			  else if(cc == clothCenter.emit &&  currentExposes.size() == 0 || currentExposes == null) cc = clothCenter.cloth;
 			  
 		  }
-		  if(Math.random() > 0.9 && parentc.generalState > 0.65) {
+		  if(Math.random() > 0.97 && parentc.generalState > 0.45) {
 			  textureAlpha = parentc.abs(textureAlpha - 1.f);
 		  }	
 		  if(Math.random() > 0.2 && parentc.generalState > 0.45) {
@@ -291,8 +290,8 @@ public class ClothObject {
 			   if(shake == true) {
 				   currentHandles = new ArrayList<DataPacket>();
 				   float newphys = (float) (Math.random()*0.1f - 0.05f) ;
-				   float newphys1 = (float) (Math.random()*0.02f - 0.01f) ;
-				   param_physics.GRAVITY = new float[]{ 0,newphys1,newphys};
+				   float newphys1 = (float) (Math.random()*0.92f - 0.01f) ;
+				   param_physics.GRAVITY = new float[] {newphys1,0,newphys};
 				   for(int i = 0; i < shakeCount; i++) {
 					   int te = particles.length;
 					   int t = parent.floor((float) (Math.random()*te));
@@ -502,7 +501,7 @@ public class ClothObject {
 		    
 		    target.pushMatrix();		    
 		    for(lineAttach tb : currentBadges) {
-		    		
+		    		tb.lifetime += 0.01;
 		    		PVector pos = new PVector(particles[tb.id].cx,particles[tb.id].cy,particles[tb.id].cz);
 		    	    PVector position = new PVector(particles[450].cx,particles[450].cy,particles[450].cz);
 
@@ -510,11 +509,11 @@ public class ClothObject {
 		    	    float y = (float) (position.y + pos.y);
 		    	    float z = (float) (position.z + pos.z);
 		    	    
-		    	    float x0 = (float) (position.x + (pos.x*200));
-		    	    float y0 = (float) (position.y + (pos.y*200));
-		    	    float z0 = (float) (position.z + (pos.z*200));
+		    	    float x0 = (float) (position.x + (pos.x*500*tb.lifetime));
+		    	    float y0 = (float) (position.y + (pos.y*500*tb.lifetime));
+		    	    float z0 = (float) (position.z + (pos.z*500*tb.lifetime));
 		    	    target.stroke(255);
-		    	    target.strokeWeight(1);
+		    	    target.strokeWeight(2);
 		    	    target.shader(dataLines,PConstants.LINES);
 		    	    target.line(x0,y0,z0,x,y,z);
 		    }
@@ -812,6 +811,7 @@ public class ClothObject {
 		  int id;
 		  float start = 0.f;
 		  float end = 1.f;
+		  float lifetime = 0.f;
  
 		  public lineAttach(int _id) {
 			  this.id = _id;

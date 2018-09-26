@@ -12,6 +12,8 @@ uniform vec3 count; 		// dims of requested Text
 uniform float initial;		// first glyph in map = 33
 uniform float aspectT;
 
+uniform float alpha;
+
 varying vec4 vertColor;
 varying vec4 vertTexCoord;
 
@@ -55,21 +57,11 @@ void main() {
   float uvx = (fract(vertTexCoord.s * count.x));
   float uvy = (fract(vertTexCoord.t * count.y));
   
-  //gl_FragColor = vec4(uvx,0,0,1);
+
   
   gl_FragColor = texture2D(glyphMap,vec2(offsetx + (uvx*dxTM),(1.-offsety)-(uvy*dyTM)));
-  
-  
-  /*
-    vec4 check = vec4(0.,0.,0.,1.);
-  if(col == 1) check.x = 1.;
-  else if (col == 2) check.y = 1.;
-  else if (col == 3) check.z = 1.;
-  
-  gl_FragColor = check;
-  */
-  
-  
+  gl_FragColor.a *= alpha;
+
   ////////////////
   //gl_FragColor = vec4(offsetx + (uvx*dx),offsety+(uvy*dy),0,1);
   ///////////////
