@@ -1,7 +1,8 @@
-0-An Leuten wie mir ist das System gescheitert? Wir waren doch alle dafür.
-1-Wofür? Krankenhäuser schließen? Hat mich keiner gefragt.
-1-Wer keine Fragen mehr hat, der ist schon tot.
-2-Dann frag doch
-0-Ich will nicht wissen, warum sie das gemacht haben. Wie geht es weiter, will ich wissen. Und das will ich von denen hören, die uns den Scheiss eingebrockt haben.
-0-Ich will wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt.
-1-Du? Auf ne Insel? Du bist wirklich am Arsch, Alter. Träum weiter.
+0-An Leuten wie dir ist das System gescheitert…  
+1-Wir waren doch alle dafür.  
+2-Wofür? Krankenhäuser schließen? Hat mich keiner gefragt.  
+0-Nu redet doch mal zur Sache, das ist hier kein Spiel! Da sitzen zwei, die dabei waren. Warum habt ihr keine Fragen an die?  
+0-Wer keine Fragen hat, der ist schon tot.  
+1-Ich will ich wissen, wie es weiter geht. Und das will ich von denen hören, die uns den Scheiss eingebrockt haben.  
+2-Ich will wissen, ob es noch Platz auf den Inseln gibt, und wie man dahin kommt.  
+3-Du? Auf ne Insel? Du bist wirklich am Arsch, Alter. Träum weiter.  

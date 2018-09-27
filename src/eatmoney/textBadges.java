@@ -140,7 +140,7 @@ public class textBadges {
 		PGraphics textImg; 
 		int id = 0;
 		float offset;
-		String[] tagwords = {"nord-EU","EU","OC","oceancities","LTEM","LET_THEM_EAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU","HPP","CONNST","ROSSER","ROLOEG"};	
+		String[] tagwords = {"nord-EU","EU","OC","oceancities","LTEM","LET_THEM_EAT_MONEY","TARP","NOVA","YLD","ONZ","SINA","VERSION","oceanics","EU","HPP","KONNST","ROSSER","ROLOEG"};	
 		float time = 0.f;		
 		float easein = 0.f;
 		

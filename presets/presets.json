@@ -201,6 +201,7 @@
     {
   	"id" : 31,
     "visible" : 2,
+    "reset" : 1,
     "comment": 6
   	},
   	    {

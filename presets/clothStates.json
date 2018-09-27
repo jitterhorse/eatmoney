@@ -31,7 +31,7 @@
 	},
 	{
 	  "stateId": 6,
-	  "damping": 0.61999999,
+	  "damping": 0.65999999,
 	  "generalState": 1.,
 	  "shakeH" : 0
 	},

@@ -129,7 +129,7 @@ public class readData{
 			int leng = this.audio[i].getTime();
 			frame[i] = (int)(((float)pos/(float)leng)* (float)maxCount[i]);
 			if(frame[i] >= maxCount[i]*0.95 && state != State.inmix) {
-				System.out.println("reset to idle state");
+				//System.out.println("reset to idle state");
 				this.openTake(idlestate);
 			}
 			
@@ -208,7 +208,7 @@ public class readData{
   
   public void toggleNoise() {
 	  shownoise = !shownoise; 
-	  System.out.println("noise: " + shownoise);
+	  //System.out.println("noise: " + shownoise);
   }
   
   

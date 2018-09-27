@@ -215,9 +215,11 @@ public class ClothObject {
 		  
 		  if(Math.random() > 0.75 && parentc.generalState > 0.15) {	  
 			  DISPLAY_MESH = !DISPLAY_MESH;
+			  if(DISPLAY_MESH == true) easing = 0.f;
 		  }
 		  if(Math.random() > 0.75 && parentc.generalState > 0.15) {
 			  DISPLAY_GRID = !DISPLAY_GRID;
+			 
 		  }	
 		  
 		  if(Math.random() > 0.97 && parentc.generalState > 0.35) {
@@ -227,9 +229,11 @@ public class ClothObject {
 			  else if(cc == clothCenter.emit &&  currentExposes.size() == 0 || currentExposes == null) cc = clothCenter.cloth;
 			  
 		  }
+		  /*
 		  if(Math.random() > 0.97 && parentc.generalState > 0.45) {
 			  textureAlpha = parentc.abs(textureAlpha - 1.f);
 		  }	
+		  */
 		  if(Math.random() > 0.2 && parentc.generalState > 0.45) {
 			  clothMoverSpeeds[0] = (float) (Math.random()*0.03f);
 			  clothMoverSpeeds[1] = (float) (Math.random()*0.05f);
@@ -244,6 +248,7 @@ public class ClothObject {
 		  currentExposes = new ArrayList<GridExpose>();
 		  TB.currentBadges = new ArrayList<textB>();
 		  DISPLAY_MESH           = true;
+		  easing = 0.01f;
 		  DISPLAY_GRID 		     = false;
 		  textureAlpha = 1.f;
 	  }
@@ -290,7 +295,7 @@ public class ClothObject {
 			   if(shake == true) {
 				   currentHandles = new ArrayList<DataPacket>();
 				   float newphys = (float) (Math.random()*0.1f - 0.05f) ;
-				   float newphys1 = (float) (Math.random()*0.92f - 0.01f) ;
+				   float newphys1 = (float) (Math.random()*0.92f - 0.46f) ;
 				   param_physics.GRAVITY = new float[] {newphys1,0,newphys};
 				   for(int i = 0; i < shakeCount; i++) {
 					   int te = particles.length;
@@ -422,13 +427,14 @@ public class ClothObject {
 	  }
 	
 	  public void drawCloth(PGraphics target) {
-		  
+		 
 		  //DISPLAY_MESH = true;
-		  if(cc == clothCenter.comment) {
+		  if(cc == clothCenter.comment || parentc.cont.nextPreset == 1) {
 			DISPLAY_MESH = false;
 		  }
 		  
 		  if(DISPLAY_MESH){
+			  if(easing < 1. && displaymode != ObjectMode.out) easing += 0.025f;
 			  target.pushMatrix();
 		      for(DwSoftBody3D body : softbodies){
 		    	body.createShapeMesh(target);		    	

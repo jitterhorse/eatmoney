@@ -46,7 +46,7 @@ public class eatMoneyController {
 	
 	public Slider state,damping;
 	
-	int nextPreset = 0;
+	public int nextPreset = 0;
 	int lastrunning = 0;
 	int coloractive;
 	int colorinactive;

@@ -260,7 +260,7 @@ public class eatMoneyMain extends PApplet {
 			  			cameraspeed = generalState*0.01f;
 			  			cameraNewPos.x = middle.x + (random(1000)-500.f);
 			  			cameraNewPos.y = random(600)-300.f;
-			  			cameraNewPos.z = random(100) + 100.f * -1.f;
+			  			cameraNewPos.z = random(100) + 200.f * -1.f;
 			  		}
 		  		}
 		  		else if(co.cc == clothCenter.pin) {
@@ -315,7 +315,7 @@ public class eatMoneyMain extends PApplet {
 		  		offset = bo.camoffset;
 		  		middle = bo.butlerMean;
 		  		middle.add(bo.ButlerOffset);
-		  		if(random(1.f)>0.99f) {
+		  		if(random(1.f)>0.99f && bo.displaymode == ObjectMode.run) {
   				  camPosnew = new PVector((random(1.f) *1600)-800.f,(random(1.f) * 200)-70,(random(1.f) *1200)-200.f);
   				  camPosnew.add(bo.ButlerOffset);
   				  cameraspeed = random(0.005f,0.01f);
@@ -358,9 +358,7 @@ public class eatMoneyMain extends PApplet {
 		     middleSlidePos.x = lerp(middleSlidePos.x,middle.x+noiseVal,(float) cameraspeed);
 		     middleSlidePos.y = lerp(middleSlidePos.y,middle.y+noiseVal2,(float) cameraspeed);
 		     middleSlidePos.z = lerp(middleSlidePos.z,middle.z+noiseVal3,(float) cameraspeed);
-
-		    
-		     
+ 
 		     lightRig.doLight(offset);
 		    
 		     mc.camera(cameraSlidePos.x, cameraSlidePos.y,cameraSlidePos.z,middleSlidePos.x,middleSlidePos.y,middleSlidePos.z, 0, 1, 0);
@@ -575,7 +573,7 @@ public class eatMoneyMain extends PApplet {
 			stroke(255,255);
 			textSize(15);
 			textAlign(LEFT,TOP);
-		    text("FPS: " + frameRate + " / CamSpeed: " + cameraspeed,20,570);
+		    text("FPS: " + frameRate + " / BO:" + bo.displaymode + " , " + bo.easing,20,570);
 		}
 	    
 	}
@@ -585,9 +583,9 @@ public class eatMoneyMain extends PApplet {
 	void oscEvent(OscMessage theOscMessage) {
 		if(runStatus == status.RUN) {
 		  if(theOscMessage.addrPattern().equals("/butler")) {
-			  if(showMode != mode.butler) startButler();
+			  if(showMode != mode.butler && theOscMessage.arguments().length != 0) startButler();
 			  int take = theOscMessage.get(0).intValue(); 
-			  bo.butlerData.openTake(take);
+			   bo.butlerData.openTake(take);
 		  }
 		  if(theOscMessage.addrPattern().equals("/beep")) {
 			  int note = theOscMessage.get(0).intValue(); 
@@ -597,15 +595,6 @@ public class eatMoneyMain extends PApplet {
 			  }  
 		  }
 		  
-		  
-		  /*
-		  if(theOscMessage.addrPattern().equals("/band")) {
-			  for(int i = 0; i < 8; i++) {
-				  bo.butlerData.deformMatrix[i] = theOscMessage.get(i).floatValue();
-			  }
-		  
-		  }
-		  */
 		 }
 	}
 	
@@ -717,7 +706,7 @@ public class eatMoneyMain extends PApplet {
   		if(bo.displaymode != ObjectMode.off && bo.displaymode != ObjectMode.out) bo.displaymode = ObjectMode.out;
  
 	}
-	
+	/*
 	public void showEmpty() {
 		if(showMode == mode.comment) {
 			co.stopComment();
@@ -730,7 +719,7 @@ public class eatMoneyMain extends PApplet {
 			 if(bo.displaymode != ObjectMode.off)  bo.displaymode = ObjectMode.out;
 			 showMode = mode.empty;
 	}
-	
+	*/
 	public void changeCloth(int id) {
 		cstates.loadState(id);
 	}
@@ -738,32 +727,9 @@ public class eatMoneyMain extends PApplet {
 	
 	public void keyPressed() {
 		  switch(key) {
-		  case '0' : showEmpty();
-			 	     return;
 
 		  case '1' : showCloth();
-		  		     return;
-		  		     
-		  case '2' : showVideo(0);
-		  			 return;
-
-		  case '3' : showVideo(1);
-		  			 return;
-		  			 
-		  case '4' : showVideo(2);
-		  			 return;
-	  			 	 
-		  case '6' : startButler();
-		  			 return;	
-		  			 
-		  case '7' : if(bo.displaymode == ObjectMode.run) {
-				  		 bo.butlerData.openTake(bo.nextvid);
-				  		 bo.nextvid++;
-				 		 if(bo.nextvid>=73) bo.nextvid = 20;
-		  			 }
-					 return;			 		 
-
-		  			 
+		  		     return;		 
 		  case 'q' : co.reState();
 			 		 return;  			 
 		  case 'w' : co.shake();
